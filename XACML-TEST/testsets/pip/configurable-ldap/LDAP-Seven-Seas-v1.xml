@@ -1,16 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<PolicySet xmlns="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17" PolicySetId="urn:com:att:xacml:policy:id:bac03bee-a7d9-485e-b55e-f58797bbe192" Version="1" PolicyCombiningAlgId="urn:oasis:names:tc:xacml:1.0:policy-combining-algorithm:first-applicable">
-    <Description>Sample policy that demonstrates use of Configurable LDAP Resolver with sample data.
+<Policy xmlns="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17" PolicyId="urn:com:att:xacml:policy:id:94378f81-6810-408f-a072-a1a8a7585a24" Version="1" RuleCombiningAlgId="urn:oasis:names:tc:xacml:1.0:rule-combining-algorithm:first-applicable">
+	<Description>Sample policy that demonstrates use of Configurable LDAP Resolver with sample data.
 
 The PEP Request should provide the following attributes:
 action-id=board
 subject-id-qualifer=uid|mail
 subject-id=hnelson|hnelson@royalnavy.mod.uk
 resource-id=HMS Lydia|HMS Victory|HMS Bounty
-</Description>
-    <Target/>
-    <Policy PolicyId="urn:com:att:xacml:policy:id:94378f81-6810-408f-a072-a1a8a7585a24" Version="1" RuleCombiningAlgId="urn:oasis:names:tc:xacml:1.0:rule-combining-algorithm:first-applicable">
-        <Description>Policy for boarding a ship.</Description>
+	</Description>
         <Target>
             <AnyOf>
                 <AllOf>
@@ -39,5 +36,4 @@ resource-id=HMS Lydia|HMS Victory|HMS Bounty
             <Description>Default is to DENY.</Description>
             <Target/>
         </Rule>
-    </Policy>
-</PolicySet>
+</Policy>

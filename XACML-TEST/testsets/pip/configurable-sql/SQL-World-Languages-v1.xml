@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<PolicySet xmlns="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17" PolicySetId="urn:com:att:xacml:policy:id:ba943f59-5a1b-4667-a5e2-8bd9c2e14ca8" Version="1" PolicyCombiningAlgId="urn:oasis:names:tc:xacml:1.0:policy-combining-algorithm:first-applicable">
-    <Description>This is a sample policy used for testing configurable JDBC engine and resolvers.</Description>
-    <Target/>
-    <Policy PolicyId="urn:com:att:xacml:policy:id:25e12b06-11d5-4895-b2a2-6f6c594de069" Version="1" RuleCombiningAlgId="urn:oasis:names:tc:xacml:1.0:rule-combining-algorithm:first-applicable">
+<Policy xmlns="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17" PolicyId="urn:com:att:xacml:policy:id:25e12b06-11d5-4895-b2a2-6f6c594de069" Version="1" RuleCombiningAlgId="urn:oasis:names:tc:xacml:1.0:rule-combining-algorithm:first-applicable">
         <Description>Policy for speaking a language in a city.</Description>
         <Target>
             <AnyOf>
@@ -34,5 +31,4 @@
             <Description>DENY - default.</Description>
             <Target/>
         </Rule>
-    </Policy>
-</PolicySet>
+</Policy>
