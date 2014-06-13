@@ -66,7 +66,11 @@ public class EngineFinder implements PIPFinder {
 			List<PIPEngine> listPIPEngines	= iterPIPEngineLists.next();
 			for (PIPEngine pipEngine : listPIPEngines) {
 				if (pipEngine != exclude) {
-					PIPResponse pipResponseEngine	= pipEngine.getAttributes(pipRequest, pipFinderParent);
+					PIPResponse pipResponseEngine = null;
+					try {
+						pipResponseEngine = pipEngine.getAttributes(pipRequest, pipFinderParent);
+					} catch (Exception e) {
+					}
 					if (pipResponseEngine != null) {
 						if (pipResponseEngine.getStatus() == null || pipResponseEngine.getStatus().isOk()) {
 							pipResponse.addAttributes(pipResponseEngine.getAttributes());
