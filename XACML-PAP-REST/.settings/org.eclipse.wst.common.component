@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?><project-modules id="moduleCoreId" project-version="1.5.0">
+    <wb-module deploy-name="XACML-PAP-REST">
+        <wb-resource deploy-path="/" source-path="/WebContent" tag="defaultRootSource"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/src"/>
+        <dependent-module archiveName="XACML.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/XACML/XACML">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="XACML-PDP.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/XACML-PDP/XACML-PDP">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="XACML-REST.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/XACML-REST/XACML-REST">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <property name="context-root" value="XACML-PAP-REST"/>
+        <property name="java-output-path" value="/XACML-PAP-REST/build/classes"/>
+    </wb-module>
+</project-modules>
