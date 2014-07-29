@@ -722,7 +722,7 @@ public class JSONRequest {
 
 	
 	/**
-	 * Load the "Default Category" objects, if any.  This is used for the special cases of Subject, Action, Resource, and Environment
+	 * Load the "Default Category" objects, if any.  This is used for the special cases of AccessSubject, Action, Resource, and Environment
 	 * 
 	 * @param jsonRequestMap
 	 * @param categoryName
@@ -898,31 +898,54 @@ public class JSONRequest {
 			
 			// The following may be either a single instance or an array.  This allows multiple decisions to work with the Default Category objects.
 			//	Example:
-			//		"Subject" : [ {attributes group one},
+			//		"AccessSubject" : [ {attributes group one},
 			//						{attributes group two}
 			//					]
 			
 			//
-			// Look for default Subject
+			// Look for default Shorthand AccessSubject
+			//
+			parseDefaultCategory(jsonRequestMap, "AccessSubject", "urn:oasis:names:tc:xacml:1.0:subject-category:access-subject",  stdMutableRequest);
+			//
+			// Provide backward compatibility for our PEP's
 			//
 			parseDefaultCategory(jsonRequestMap, "Subject", "urn:oasis:names:tc:xacml:1.0:subject-category:access-subject",  stdMutableRequest);
 	
 			//
-			// Look for default Action
+			// Look for default Shorthand Action
 			//
 			parseDefaultCategory(jsonRequestMap, "Action", "urn:oasis:names:tc:xacml:3.0:attribute-category:action",  stdMutableRequest);
 			
 			//
-			// Look for default Resource
+			// Look for default Shorthand Resource
 			//
 			parseDefaultCategory(jsonRequestMap, "Resource", "urn:oasis:names:tc:xacml:3.0:attribute-category:resource",  stdMutableRequest);
 	
 			//
-			// Look for default Environment
+			// Look for default Shorthand Environment
 			//
 			parseDefaultCategory(jsonRequestMap, "Environment", "urn:oasis:names:tc:xacml:3.0:attribute-category:environment",  stdMutableRequest);
 
-				
+			//
+			// Look for default Shorthand RecipientSubject
+			//
+			parseDefaultCategory(jsonRequestMap, "RecipientSubject", "urn:oasis:names:tc:xacml:1.0:subject-category:recipient-subject",  stdMutableRequest);
+			
+			//
+			// Look for default Shorthand IntermediarySubject
+			//
+			parseDefaultCategory(jsonRequestMap, "IntermediarySubject", "urn:oasis:names:tc:xacml:1.0:subject-category:intermediary-subject",  stdMutableRequest);
+			
+			//
+			// Look for default Shorthand Codebase
+			//
+			parseDefaultCategory(jsonRequestMap, "Codebase", "urn:oasis:names:tc:xacml:1.0:subject-category:codebase",  stdMutableRequest);
+			
+			//
+			// Look for default Shorthand RequestingMachine
+			//
+			parseDefaultCategory(jsonRequestMap, "RequestingMachine", "urn:oasis:names:tc:xacml:1.0:subject-category:requesting-machine",  stdMutableRequest);
+			
 			
 			//
 			// MultiRequest
@@ -1229,7 +1252,7 @@ public class JSONRequest {
 			// This is fine when the categories are contained in the array of Category objects,
 			// but if we use the Default category objects we might end up with multiples of the same Category name,
 			// and the Jackson parser does not handle that well.
-			// Example: This is ok because the Subjects are independent items within the list:
+			// Example: This is ok because the AccessSubjects are independent items within the list:
 			// 		{ "Request" : {
 			//			"Category" : [
             //             { "CategoryId" : ""subject", " },
@@ -1239,8 +1262,8 @@ public class JSONRequest {
 			//
 			// This is NOT ok because the Subjects are seen as duplicate elements:
 			//		{ "Request" : {
-            //		   "Subject" : {"},
-            //		   "Subject" : {"},
+            //		   "AccessSubject" : {"},
+            //		   "AccessSubject" : {"},
 			//		}}
 
 			categoryMap.put("CategoryId", ra.getCategory().stringValue());

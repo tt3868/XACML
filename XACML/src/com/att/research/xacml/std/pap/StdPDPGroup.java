@@ -81,6 +81,10 @@ public class StdPDPGroup extends StdPDPItemSetChangeNotifier implements PDPGroup
 	public StdPDPGroup(String id, boolean isDefault, String name, String description, Path directory) {
 		this(id, isDefault, directory);
 		this.name = name;
+		// force all policies to have a name
+		if (name == null) {
+			this.name = id;
+		}
 		this.description = description;
 	}
 	
@@ -119,6 +123,10 @@ public class StdPDPGroup extends StdPDPItemSetChangeNotifier implements PDPGroup
 						}
 					}
 				}
+			}
+			// force all policies to have a name
+			if (this.name == null) {
+				this.name = this.id;
 			}
 		}
 		//
@@ -605,6 +613,12 @@ public class StdPDPGroup extends StdPDPItemSetChangeNotifier implements PDPGroup
 	
 	public void setPipConfigs(Set<PDPPIPConfig> pipConfigs) {
 		this.pipConfigs = pipConfigs;
+		this.firePDPGroupChanged(this);
+	}
+	
+	public void removeAllPIPConfigs() {
+		this.pipConfigs.clear();
+		this.firePDPGroupChanged(this);
 	}
 	
 	public Properties getPipConfigProperties() {
@@ -734,6 +748,10 @@ public class StdPDPGroup extends StdPDPItemSetChangeNotifier implements PDPGroup
 					this.status.addFailedPolicy(policy);
 					this.status.setStatus(Status.LOAD_ERRORS);
 				}
+				// force all policies to have a name
+				if (policy.getName() == null) {
+					policy.setName(policy.getId());
+				}
 			}
 			isRoot = false;
 		}
@@ -824,15 +842,28 @@ public class StdPDPGroup extends StdPDPItemSetChangeNotifier implements PDPGroup
 	//
 	// Methods needed for JSON deserialization
 	//
-	public StdPDPGroup(){};
+	public StdPDPGroup() {
+		
+	}
+	
+	public StdPDPGroup(PDPGroup group) {
+		this.id = group.getId();
+		this.name = group.getName();
+		this.description = group.getDescription();
+		this.isDefault = group.isDefaultGroup();
+		this.pdps = group.getPdps();
+		this.policies = group.getPolicies();
+		this.pipConfigs = group.getPipConfigs();
+	}
+
 	public boolean isDefault() {
 		return isDefault;
 	}
 	public void setDefault(boolean isDefault) {
 		this.isDefault = isDefault;
 	}
-	public void setStatus(StdPDPGroupStatus status) {
-		this.status = status;
+	public void setStatus(PDPGroupStatus status) {
+		this.status = new StdPDPGroupStatus(status);
 	}
 	public void setPolicies(Set<PDPPolicy> policies) {
 		this.policies = policies;
@@ -899,6 +930,6 @@ public class StdPDPGroup extends StdPDPItemSetChangeNotifier implements PDPGroup
 
 		return name.compareTo(((StdPDPGroup)arg0).name);
 	}
-	
+
 
 }

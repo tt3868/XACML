@@ -204,7 +204,7 @@ public class TestBase extends SimpleFileVisitor<Path> {
 	private long	responseMatches = 0;
 	private long	responseNotMatches = 0;
 	
-	protected final Pattern pattern = Pattern.compile("Request[.]\\d+[.](Permit|Deny|NA|Indet|Generate|Unknown)\\.(json|xml)");
+	protected final Pattern pattern = Pattern.compile("Request[.]\\d+[.](Permit|Deny|NA|Indeterminate|Generate|Unknown)\\.(json|xml)");
 	
 	public static boolean isJSON(Path file) {
 		return file.toString().endsWith(".json");
@@ -801,13 +801,6 @@ public class TestBase extends SimpleFileVisitor<Path> {
 	 */
 	protected void processResponse(Path requestFile, Request request, Response response, String group, int count) throws Exception {
 		//
-		// Sanity check
-		//
-		if (response == null) {
-			logger.error("Got a NULL response object.");
-			return;
-		}
-		//
 		// Construct the output filename
 		//
 		Path responseFile = null;
@@ -815,7 +808,7 @@ public class TestBase extends SimpleFileVisitor<Path> {
 		int num = requestFile.getNameCount();
 		if (num < 2) {
 			logger.error("Too few dir's in request filename.");
-			return;
+			throw new Exception("Too few dir's in request filename. Format should be Request.[0-9]+.{Permit|Deny|NA|Indeterminate}.{json|xml}");
 		}
 		String filename = requestFile.getFileName().toString();
 		if (group.equals("Generate")) {
@@ -900,24 +893,34 @@ public class TestBase extends SimpleFileVisitor<Path> {
 				//
 				// Do the compare
 				//
-				if (response.equals(expectedResponse)) {
-					logger.info("Response matches expected response.");
-					this.responseMatches++;
-				} else {
-					logger.error("Response does not match expected response.");
-					logger.error("Expected: ");
-					logger.error(expectedResponse.toString());
+				if (response == null) {
+					logger.error("NULL response returned.");
 					this.responseNotMatches++;
 					succeeded = false;
+				} else {
+					if (response.equals(expectedResponse)) {
+						logger.info("Response matches expected response.");
+						this.responseMatches++;
+					} else {
+						logger.error("Response does not match expected response.");
+						logger.error("Expected: ");
+						logger.error(expectedResponse.toString());
+						this.responseNotMatches++;
+						succeeded = false;
+					}
 				}
 			}
 		}
 		//
 		// Write the response to the result file
 		//
-		logger.info("Request: " + requestFile.getFileName() + " response is: " + response.toString());
-		if (resultFile != null) {
-			Files.write(resultFile, response.toString().getBytes());
+		logger.info("Request: " + requestFile.getFileName() + " response is: " + (response == null ? "null" : response.toString()));
+		if (resultFile != null && response != null) {
+			if (TestBase.isJSON(resultFile)) {
+				Files.write(resultFile, JSONResponse.toString(response, true).getBytes());
+			} else if (TestBase.isXML(resultFile)) {
+				Files.write(resultFile, DOMResponse.toString(response, true).getBytes());
+			}
 		}
 		//
 		// Stats
@@ -931,43 +934,45 @@ public class TestBase extends SimpleFileVisitor<Path> {
 		} else if (group.equals("Indeterminate")) {
 			this.expectedIndeterminates++;
 		}
-		for (Result result : response.getResults()) {
-			Decision decision = result.getDecision();
-			if (group.equals("Generate")) {
+		if (response != null) {
+			for (Result result : response.getResults()) {
+				Decision decision = result.getDecision();
+				if (group.equals("Generate")) {
+					if (decision.equals(Decision.PERMIT)) {
+						this.generatedpermits++;
+					} else if (decision.equals(Decision.DENY)) {
+						this.generateddenies++;
+					} else if (decision.equals(Decision.NOTAPPLICABLE)) {
+						this.generatednotapplicables++;
+					} else if (decision.equals(Decision.INDETERMINATE)) {
+						this.generatedindeterminates++;
+					}
+					continue;
+				}
 				if (decision.equals(Decision.PERMIT)) {
-					this.generatedpermits++;
+					this.permits++;
+					if (group.equals("Permit") == false) {
+						succeeded = false;
+						logger.error("Expected " + group + " got " + decision);
+					}
 				} else if (decision.equals(Decision.DENY)) {
-					this.generateddenies++;
+					this.denies++;
+					if (group.equals("Deny") == false) {
+						succeeded = false;
+						logger.error("Expected " + group + " got " + decision);
+					}
 				} else if (decision.equals(Decision.NOTAPPLICABLE)) {
-					this.generatednotapplicables++;
+					this.notapplicables++;
+					if (group.equals("NA") == false) {
+						succeeded = false;
+						logger.error("Expected " + group + " got " + decision);
+					}
 				} else if (decision.equals(Decision.INDETERMINATE)) {
-					this.generatedindeterminates++;
-				}
-				continue;
-			}
-			if (decision.equals(Decision.PERMIT)) {
-				this.permits++;
-				if (group.equals("Permit") == false) {
-					succeeded = false;
-					logger.error("Expected " + group + " got " + decision);
-				}
-			} else if (decision.equals(Decision.DENY)) {
-				this.denies++;
-				if (group.equals("Deny") == false) {
-					succeeded = false;
-					logger.error("Expected " + group + " got " + decision);
-				}
-			} else if (decision.equals(Decision.NOTAPPLICABLE)) {
-				this.notapplicables++;
-				if (group.equals("NA") == false) {
-					succeeded = false;
-					logger.error("Expected " + group + " got " + decision);
-				}
-			} else if (decision.equals(Decision.INDETERMINATE)) {
-				this.indeterminates++;
-				if (group.equals("Indeterminate") == false) {
-					succeeded = false;
-					logger.error("Expected " + group + " got " + decision);
+					this.indeterminates++;
+					if (group.equals("Indeterminate") == false) {
+						succeeded = false;
+						logger.error("Expected " + group + " got " + decision);
+					}
 				}
 			}
 		}

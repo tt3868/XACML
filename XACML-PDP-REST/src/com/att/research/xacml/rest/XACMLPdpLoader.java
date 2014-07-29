@@ -33,6 +33,11 @@ import com.att.research.xacml.api.pap.PDPStatus;
 import com.att.research.xacml.api.pap.PDPStatus.Status;
 import com.att.research.xacml.api.pdp.PDPEngine;
 import com.att.research.xacml.api.pdp.PDPEngineFactory;
+import com.att.research.xacml.api.pip.PIPEngine;
+import com.att.research.xacml.api.pip.PIPException;
+import com.att.research.xacml.api.pip.PIPFinder;
+import com.att.research.xacml.api.pip.PIPFinderFactory;
+import com.att.research.xacml.std.pap.StdPDPPIPConfig;
 import com.att.research.xacml.std.pap.StdPDPPolicy;
 import com.att.research.xacml.std.pap.StdPDPStatus;
 import com.att.research.xacml.util.FactoryException;
@@ -117,7 +122,7 @@ public class XACMLPdpLoader {
 				logger.debug("Status: " + status);
 			}
 		} catch (Exception e) {
-			String error = "Failed to load Pip Config properties file: " + e.getMessage();
+			String error = "Failed to load/validate Pip Config properties file: " + e.getMessage();
 			logger.error(error, e);
 			status.addLoadError(error);
 			status.setStatus(PDPStatus.Status.LOAD_ERRORS);
@@ -178,7 +183,7 @@ public class XACMLPdpLoader {
 				status.getLoadedRootPolicies().size() + " root policies");
 		if (status.getLoadedRootPolicies().size() == 0) {
 			logger.warn("NO ROOT POLICIES LOADED!!!  Cannot serve PEP Requests.");
-			throw new PAPException("NO ROOT POLICIES LOADED!!!  Cannot serve PEP Requests.");
+			status.addLoadWarning("NO ROOT POLICIES LOADED!!!  Cannot serve PEP Requests.");
 		}
 	}
 	
@@ -260,8 +265,34 @@ public class XACMLPdpLoader {
 		}
 	}
 	
-	public static synchronized void validatePipConfiguration(Properties properties, StdPDPStatus status) {
-	
+	public static synchronized void validatePipConfiguration(Properties properties, StdPDPStatus status) throws PAPException {
+		try {
+			PIPFinderFactory factory = PIPFinderFactory.newInstance(properties);
+			if (factory == null) {
+				throw new FactoryException("Could not create PIP Finder Factory: " + properties.getProperty(XACMLProperties.PROP_PIPFINDERFACTORY));
+			}
+			PIPFinder finder = factory.getFinder(properties);
+			//
+			// Check for this, although it should always return something
+			//
+			if (finder == null) {
+				logger.error("pip finder factory returned a null engine.");
+				throw new PIPException("Could not create PIP Finder");
+			} else {
+				logger.info("Loaded PIP finder");
+			}
+			for (PIPEngine engine : finder.getPIPEngines()) {
+				logger.info("Configured PIP Engine: " + engine.getName());
+				StdPDPPIPConfig config = new StdPDPPIPConfig();
+				config.setName(engine.getName());
+				status.addLoadedPipConfig(config);
+			}
+		} catch (FactoryException | PIPException e) {
+			logger.error("validate PIP configuration failed: " + e.getLocalizedMessage());
+			status.addLoadError(e.getLocalizedMessage());
+			status.setStatus(Status.LOAD_ERRORS);
+			throw new PAPException(e);
+		}
 	}
 	
 	/**

@@ -10,6 +10,8 @@
  */
 package com.att.research.xacmlatt.pdp.policy;
 
+import java.util.Properties;
+
 import com.att.research.xacml.util.FactoryException;
 import com.att.research.xacml.util.FactoryFinder;
 import com.att.research.xacmlatt.pdp.util.ATTPDPProperties;
@@ -25,12 +27,18 @@ public abstract class PolicyFinderFactory {
 	private static final String	FACTORYID					= ATTPDPProperties.PROP_POLICYFINDERFACTORY;
 	private static final String DEFAULT_FACTORY_CLASSNAME	= "com.att.research.xacmlatt.pdp.std.StdPolicyFinderFactory";
 	
-
 	protected PolicyFinderFactory() {
+	}
+	
+	protected PolicyFinderFactory(Properties properties) {
 	}
 	
 	public static PolicyFinderFactory newInstance() throws FactoryException {
 		return FactoryFinder.find(FACTORYID, DEFAULT_FACTORY_CLASSNAME, PolicyFinderFactory.class);
+	}
+	
+	public static PolicyFinderFactory newInstance(Properties properties) throws FactoryException {
+		return FactoryFinder.find(FACTORYID, DEFAULT_FACTORY_CLASSNAME, PolicyFinderFactory.class, properties);
 	}
 	
 	public static PolicyFinderFactory newInstance(String className, ClassLoader classLoader) throws FactoryException {
@@ -47,4 +55,11 @@ public abstract class PolicyFinderFactory {
 	 * @return the configured <code>PolicyFinder</code>
 	 */
 	abstract public PolicyFinder getPolicyFinder() throws FactoryException;
+
+	/**
+	 * Gets the configured {@link com.att.research.xacmlatt.pdp.policy.PolicyFinder}.
+	 * 
+	 * @return the configured <code>PolicyFinder</code>
+	 */
+	abstract public PolicyFinder getPolicyFinder(Properties properties) throws FactoryException;
 }

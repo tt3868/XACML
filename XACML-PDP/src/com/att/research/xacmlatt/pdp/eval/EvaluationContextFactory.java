@@ -10,6 +10,8 @@
  */
 package com.att.research.xacmlatt.pdp.eval;
 
+import java.util.Properties;
+
 import com.att.research.xacml.api.Request;
 import com.att.research.xacml.api.pip.PIPFinder;
 import com.att.research.xacml.util.FactoryException;
@@ -31,8 +33,15 @@ public abstract class EvaluationContextFactory {
 	protected EvaluationContextFactory() {
 	}
 	
+	protected EvaluationContextFactory(Properties properties) {
+	}
+	
 	public static EvaluationContextFactory newInstance() throws FactoryException {
 		return FactoryFinder.find(FACTORYID, DEFAULT_FACTORY_CLASSNAME, EvaluationContextFactory.class);
+	}
+	
+	public static EvaluationContextFactory newInstance(Properties properties) throws FactoryException {
+		return FactoryFinder.find(FACTORYID, DEFAULT_FACTORY_CLASSNAME, EvaluationContextFactory.class, properties);
 	}
 	
 	public static EvaluationContextFactory newInstance(String className, ClassLoader classLoader) throws FactoryException {
@@ -66,4 +75,5 @@ public abstract class EvaluationContextFactory {
 	 * @param pipFinder the <code>PIPFinder</code> to use in creating new <code>EvaluationContext</code>s.
 	 */
 	public abstract void setPIPFinder(PIPFinder pipFinder);
+
 }

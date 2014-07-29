@@ -29,6 +29,9 @@ public class StdPIPFinderFactory extends PIPFinderFactory {
 	public StdPIPFinderFactory() {
 	}
 
+	public StdPIPFinderFactory(Properties properties) {
+	}
+
 	@Override
 	public PIPFinder getFinder() throws PIPException {
 		if (pipFinder == null) {
@@ -51,4 +54,16 @@ public class StdPIPFinderFactory extends PIPFinderFactory {
 		return pipFinder;
 	}
 
+	@Override
+	public PIPFinder getFinder(Properties properties) throws PIPException {
+		if (pipFinder == null) {
+			synchronized(this) {
+				if (pipFinder == null) {
+					pipFinder					= new ConfigurableEngineFinder();
+					((ConfigurableEngineFinder)pipFinder).configure(properties);
+				}
+			}
+		}
+		return this.pipFinder;
+	}
 }

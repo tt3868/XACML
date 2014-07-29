@@ -63,6 +63,7 @@ public class ConfigurableLDAPResolver implements LDAPResolver {
 		catch (FactoryException fx) {
 			throw new RuntimeException(fx);
 		}
+		Velocity.setProperty( "runtime.log.logsystem.log4j.logger", "MAIN_LOG" );
 		Velocity.init();
 	}
 

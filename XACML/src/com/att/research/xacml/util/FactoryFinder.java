@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Constructor;
 import java.util.Properties;
 
 import org.apache.commons.logging.Log;
@@ -78,7 +79,7 @@ public class FactoryFinder {
 	 * @return an instance of the <code>Class</code> referenced by the factory ID
 	 * @throws FactoryException
 	 */
-	private static <T> T findJarServiceProvider(String factoryId, Class<T> classExtends) throws FactoryException {
+	private static <T> T findJarServiceProvider(String factoryId, Class<T> classExtends, Properties xacmlProperties) throws FactoryException {
 		String serviceId	= "META-INF/services/" + factoryId;
 		InputStream is		= null;
 		
@@ -145,17 +146,37 @@ public class FactoryFinder {
 			if (logger.isDebugEnabled()) {
 				logger.debug("Found in resource, value=" + factoryClassName);
 			}
-			return newInstance(factoryClassName, classExtends, cl, false);
+			return newInstance(factoryClassName, classExtends, cl, false, xacmlProperties);
 		}
 		
 		return null;
 	}
-	
+
 	public static <T> T newInstance(String className, Class<T> classExtends, ClassLoader cl, boolean doFallback) throws FactoryException {
+		return FactoryFinder.newInstance(className, classExtends, cl, doFallback, null);
+	}
+	
+	public static <T> T newInstance(String className, Class<T> classExtends, ClassLoader cl, boolean doFallback, Properties xacmlProperties) throws FactoryException {
 		try {
 			Class<?> providerClass	= getProviderClass(className, cl, doFallback);
 			if (classExtends.isAssignableFrom(providerClass)) {
-				Object instance	= providerClass.newInstance();
+				Object instance = null;
+				if (xacmlProperties == null) {
+					instance	= providerClass.newInstance();
+				} else {
+					//
+					// Search for a constructor that takes Properties
+					//
+					for (Constructor<?> constructor : providerClass.getDeclaredConstructors()) {
+						Class<?>[] params = constructor.getParameterTypes();
+						if (params.length == 1 && params[0].isAssignableFrom(Properties.class)) {
+							instance = constructor.newInstance(xacmlProperties);
+						}
+					}
+					if (instance == null) {
+						throw new Exception("No constructor that takes a Properties object.");
+					}
+				}
 				if (logger.isTraceEnabled()) {
 					logger.trace("Created new instance of " + providerClass + " using ClassLoader: " + cl);
 				}
@@ -169,8 +190,12 @@ public class FactoryFinder {
 			throw new FactoryException("Provider " + className + " could not be instantiated: " + ex.getMessage(), ex);
 		}
 	}
-	
+
 	public static <T> T find(String factoryId, String fallbackClassName, Class<T> classExtends) throws FactoryException {
+		return FactoryFinder.find(factoryId, fallbackClassName, classExtends, null);
+	}	
+	
+	public static <T> T find(String factoryId, String fallbackClassName, Class<T> classExtends, Properties xacmlProperties) throws FactoryException {
 		if (logger.isTraceEnabled()) {
 			logger.trace("Find factoryId=" + factoryId);
 		}
@@ -182,7 +207,7 @@ public class FactoryFinder {
 			if (logger.isDebugEnabled()) {
 				logger.debug("Found system property, value=" + systemProp);
 			}
-			return newInstance(systemProp, classExtends, null, true);
+			return newInstance(systemProp, classExtends, null, true, xacmlProperties);
 		}
 		
 		/*
@@ -191,17 +216,16 @@ public class FactoryFinder {
 		 */
 		try {
 			String factoryClassName		= null;
-			Properties xacmlProperties	= XACMLProperties.getProperties();
 			if (xacmlProperties == null) {
-				throw new Exception("No " + XACMLProperties.XACML_PROPERTIES_NAME + " found");
+				factoryClassName	= XACMLProperties.getProperty(factoryId);
+			} else {
+				factoryClassName	= xacmlProperties.getProperty(factoryId);
 			}
-			factoryClassName	= xacmlProperties.getProperty(factoryId);
-			
 			if (factoryClassName != null) {
 				if (logger.isTraceEnabled()) {
 					logger.trace("Found factoryId xacml.properties, value=" + factoryClassName);
 				}
-				return newInstance(factoryClassName, classExtends, null, true);
+				return newInstance(factoryClassName, classExtends, null, true, xacmlProperties);
 			}
 		} catch (Exception ex) {
 			logger.error("Exception reading xacml.properties", ex);
@@ -210,7 +234,7 @@ public class FactoryFinder {
 		/*
 		 * Try the Jar Service Provider Mechanism
 		 */
-		T provider	= findJarServiceProvider(factoryId, classExtends);
+		T provider	= findJarServiceProvider(factoryId, classExtends, xacmlProperties);
 		if (provider != null) {
 			return provider;
 		}
@@ -224,7 +248,7 @@ public class FactoryFinder {
 		if (logger.isDebugEnabled()) {
 			logger.debug("Loaded from fallback value: " + fallbackClassName);
 		}
-		return newInstance(fallbackClassName, classExtends, null, true);
+		return newInstance(fallbackClassName, classExtends, null, true, xacmlProperties);
 	}
 
 }

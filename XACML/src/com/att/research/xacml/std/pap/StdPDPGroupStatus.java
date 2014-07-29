@@ -50,8 +50,29 @@ public class StdPDPGroupStatus implements PDPGroupStatus {
 	
 	
 	// Constructor needed for JSON deserialization
-	public StdPDPGroupStatus() {}
+	public StdPDPGroupStatus() {
+		
+	}
 	
+	public StdPDPGroupStatus(Status status) {
+		this.status = status;
+	}
+
+	public StdPDPGroupStatus(PDPGroupStatus stat) {
+		this.status = stat.getStatus();
+		this.failedPDPs.clear(); this.failedPDPs.addAll(stat.getFailedPDPs());
+		this.failedPIPConfigs.clear(); this.failedPIPConfigs.addAll(stat.getFailedPipConfigs());
+		this.failedPolicies.clear(); this.failedPolicies.addAll(stat.getFailedPolicies());
+		this.inSynchPDPs.clear(); this.inSynchPDPs.addAll(stat.getInSynchPDPs());
+		this.lastUpdateFailedPDPs.clear(); this.lastUpdateFailedPDPs.addAll(stat.getLastUpdateFailedPDPs());
+		this.loadedPIPConfigs.clear(); this.loadedPIPConfigs.addAll(stat.getLoadedPipConfigs());
+		this.loadedPolicies.clear(); this.loadedPolicies.addAll(stat.getLoadedPolicies());
+		this.loadErrors.clear(); this.loadErrors.addAll(stat.getLoadErrors());
+		this.loadWarnings.clear(); this.loadWarnings.addAll(stat.getLoadWarnings());
+		this.outOfSynchPDPs.clear(); this.outOfSynchPDPs.addAll(stat.getOutOfSynchPDPs());
+		this.unknownPDPs.clear(); this.unknownPDPs.addAll(stat.getUpdatingPDPs());
+		this.updatingPDPs.clear(); this.updatingPDPs.addAll(stat.getUpdatingPDPs());
+	}
 
 	public Set<PDPPIPConfig> getLoadedPIPConfigs() {
 		return loadedPIPConfigs;
@@ -99,18 +120,6 @@ public class StdPDPGroupStatus implements PDPGroupStatus {
 		this.lastUpdateFailedPDPs = lastUpdateFailedPDPs;
 	}
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	public StdPDPGroupStatus(Status status) {
-		this.status = status;
-	}
 
 	@Override
 	public Status getStatus() {

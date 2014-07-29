@@ -10,6 +10,8 @@
  */
 package com.att.research.xacml.api;
 
+import java.util.Properties;
+
 import com.att.research.xacml.util.FactoryException;
 import com.att.research.xacml.util.FactoryFinder;
 
@@ -40,6 +42,12 @@ public abstract class DataTypeFactory {
 	}
 	
 	/**
+	 * Protected constructor so this class cannot be instantiated.
+	 */
+	protected DataTypeFactory(Properties properties) {
+	}
+	
+	/**
 	 * Maps the given {@link com.att.research.xacml.api.Identifier} representing a XACML data type id to a {@link com.att.research.xacml.api.DataType}
 	 * object implementing that data type.
 	 * 
@@ -52,9 +60,21 @@ public abstract class DataTypeFactory {
 	 * Creates an instance of the <code>DataTypeFactory</code> using default configuration information.
 	 * 
 	 * @return the default <code>DataTypeFactory</code>
+	 * @throws FactoryException
 	 */
 	public static DataTypeFactory newInstance() throws FactoryException {
 		return FactoryFinder.find(FACTORYID, DEFAULT_FACTORY_CLASSNAME, DataTypeFactory.class);
+	}
+	
+	/**
+	 * Creates an instance of the <code>DataTypeFactory</code> using default configuration information.
+	 * 
+	 * @param properties
+	 * @return the default <code>DataTypeFactory</code>
+	 * @throws FactoryException
+	 */
+	public static DataTypeFactory newInstance(Properties properties) throws FactoryException {
+		return FactoryFinder.find(FACTORYID, DEFAULT_FACTORY_CLASSNAME, DataTypeFactory.class, properties);
 	}
 	
 	/**

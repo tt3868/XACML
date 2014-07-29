@@ -11,6 +11,8 @@
 
 package com.att.research.xacml.api.pdp;
 
+import java.util.Properties;
+
 import com.att.research.xacml.api.Decision;
 import com.att.research.xacml.util.FactoryException;
 import com.att.research.xacml.util.FactoryFinder;
@@ -30,7 +32,16 @@ public abstract class PDPEngineFactory {
 	private ScopeResolver scopeResolver;
 	
 	protected static Decision getConfiguredDefaultBehavior() {
-		String defaultDecisionString	= XACMLProperties.getProperty(XACMLProperties.PROP_PDP_BEHAVIOR);
+		String defaultDecisionString = XACMLProperties.getProperty(XACMLProperties.PROP_PDP_BEHAVIOR);
+		if (defaultDecisionString != null && defaultDecisionString.length() > 0) {
+			return Decision.get(defaultDecisionString);
+		} else {
+			return null;
+		}
+	}
+	
+	protected static Decision getConfiguredDefaultBehavior(Properties properties) {
+		String defaultDecisionString = properties.getProperty(XACMLProperties.PROP_PDP_BEHAVIOR);
 		if (defaultDecisionString != null && defaultDecisionString.length() > 0) {
 			return Decision.get(defaultDecisionString);
 		} else {
@@ -45,6 +56,12 @@ public abstract class PDPEngineFactory {
 	}
 	
 	/**
+	 * The constructor is protected to prevent instantiation of the class.
+	 */
+	protected PDPEngineFactory(Properties properties) {
+	}
+	
+	/**
 	 * Creates a new <code>PDPEngineFactory</code> instance by examining initialization resources from
 	 * various places to determine the class to instantiate and return.
 	 * 
@@ -53,6 +70,21 @@ public abstract class PDPEngineFactory {
 	public static PDPEngineFactory newInstance() throws FactoryException {
 		PDPEngineFactory pdpEngineFactory	= FactoryFinder.find(FACTORYID, DEFAULT_FACTORY_CLASSNAME, PDPEngineFactory.class);
 		Decision defaultDecisionBehavior	= getConfiguredDefaultBehavior();
+		if (defaultDecisionBehavior != null) {
+			pdpEngineFactory.setDefaultBehavior(defaultDecisionBehavior);
+		}
+		return pdpEngineFactory;
+	}
+	
+	/**
+	 * Creates a new <code>PDPEngineFactory</code> instance by examining initialization resources from
+	 * various places to determine the class to instantiate and return.
+	 * 
+	 * @return an instance of an object that extends <code>PDPEngineFactory</code> to use in creating <code>PDPEngine</code> objects.
+	 */
+	public static PDPEngineFactory newInstance(Properties properties) throws FactoryException {
+		PDPEngineFactory pdpEngineFactory	= FactoryFinder.find(FACTORYID, DEFAULT_FACTORY_CLASSNAME, PDPEngineFactory.class, properties);
+		Decision defaultDecisionBehavior	= getConfiguredDefaultBehavior(properties);
 		if (defaultDecisionBehavior != null) {
 			pdpEngineFactory.setDefaultBehavior(defaultDecisionBehavior);
 		}
@@ -97,6 +129,13 @@ public abstract class PDPEngineFactory {
 	 * @return a new <code>PDPEngine</code>
 	 */
 	public abstract PDPEngine newEngine() throws FactoryException;
+	
+	/**
+	 * Creates a new <code>PDPEngine</code> using the default policy set and {@link com.att.research.xacml.api.pip.PIPFinder}.
+	 * 
+	 * @return a new <code>PDPEngine</code>
+	 */
+	public abstract PDPEngine newEngine(Properties properties) throws FactoryException;
 	
 	/*
 	 * TODO: There needs to be an interface where you can request a PDPEngine based on a set of profiles.  This could be quite complex,

@@ -10,6 +10,8 @@
  */
 package com.att.research.xacmlatt.pdp.policy;
 
+import java.util.Properties;
+
 import com.att.research.xacml.api.Identifier;
 import com.att.research.xacml.util.FactoryException;
 import com.att.research.xacml.util.FactoryFinder;
@@ -27,7 +29,9 @@ public abstract class FunctionDefinitionFactory {
 	private static final String DEFAULT_FACTORY_CLASSNAME	= "com.att.research.xacmlatt.pdp.std.StdFunctionDefinitionFactory";
 	
 	protected FunctionDefinitionFactory() {
-		
+	}
+	
+	protected FunctionDefinitionFactory(Properties properties) {
 	}
 	
 	/**
@@ -45,6 +49,15 @@ public abstract class FunctionDefinitionFactory {
 	 */
 	public static FunctionDefinitionFactory newInstance() throws FactoryException {
 		return FactoryFinder.find(FACTORYID, DEFAULT_FACTORY_CLASSNAME, FunctionDefinitionFactory.class);
+	}
+	
+	/**
+	 * Creates an instance of the <code>FunctionDefinitionFactory</code> using default configuration information.
+	 * 
+	 * @return the default <code>FunctionDefinitionFactory</code>
+	 */
+	public static FunctionDefinitionFactory newInstance(Properties properties) throws FactoryException {
+		return FactoryFinder.find(FACTORYID, DEFAULT_FACTORY_CLASSNAME, FunctionDefinitionFactory.class, properties);
 	}
 	
 	/**

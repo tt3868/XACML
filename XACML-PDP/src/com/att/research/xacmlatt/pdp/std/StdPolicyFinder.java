@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -308,6 +309,10 @@ public class StdPolicyFinder implements PolicyFinder {
 		}
 	}
 	
+	public StdPolicyFinder(List<PolicyDef> rootPolicies, List<PolicyDef> referencedPolicies, Properties properties) {
+		this(rootPolicies, referencedPolicies);
+	}
+
 	@Override
 	public PolicyFinderResult<PolicyDef> getRootPolicyDef(EvaluationContext evaluationContext) {
 		PolicyDef policyDefFirstMatch			= null;

@@ -10,6 +10,8 @@
  */
 package com.att.research.xacml.std.trace;
 
+import java.util.Properties;
+
 import com.att.research.xacml.api.trace.TraceEngine;
 import com.att.research.xacml.api.trace.TraceEvent;
 
@@ -26,12 +28,24 @@ public class NullTraceEngine implements TraceEngine {
 	protected NullTraceEngine() {
 	}
 	
+	protected NullTraceEngine(Properties properties) {
+	}
+	
 	/**
 	 * Gets the single instance of the <code>NullTraceEngine</code> class.
 	 * 
 	 * @return the single instance of the <code>NullTraceEngine</code> class.
 	 */
 	public static NullTraceEngine newInstance() {
+		return nullTraceEngine;
+	}
+
+	/**
+	 * Gets the single instance of the <code>NullTraceEngine</code> class.
+	 * 
+	 * @return the single instance of the <code>NullTraceEngine</code> class.
+	 */
+	public static NullTraceEngine newInstance(Properties properties) {
 		return nullTraceEngine;
 	}
 

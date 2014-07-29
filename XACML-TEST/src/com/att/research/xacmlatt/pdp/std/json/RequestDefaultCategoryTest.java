@@ -88,7 +88,7 @@ public class RequestDefaultCategoryTest {
 					    "} " +
 					"], " +
 					    
-					"\"Subject\":{ " +
+					"\"AccessSubject\":{ " +
 						"\"Content\" : \"<?xml version=\\\"1.0\\\"?><catalog>" + 
 							"<book id=\\\"bk101\\\"><author>Gambardella, Matthew</author><title>XML Developer's Guide</title><genre>Computer</genre>" +
 							"<price>44.95</price><publish_date>2000-10-01</publish_date><description>An in-depth look at creating applications with XML.</description>"+
@@ -112,7 +112,7 @@ public class RequestDefaultCategoryTest {
 	 */
 	String exampleFromSpec = "{ " +
 			"\"Request\" : { " +
-				"\"Subject\" : { " +
+				"\"AccessSubject\" : { " +
 					"\"Attribute\": [ " +
 						"{ " +
 							"\"Id\" : \"subject-id\", " +
@@ -182,12 +182,169 @@ public class RequestDefaultCategoryTest {
 		"} ";
 
 	
-	
+	// test Shorthand Category notation for elements not tested in their own section below.
+	// Categories that are more commonly used are fully tested. 
+	// Given that the functions within the categories are the same irrespective of the name of the category, 
+	// we assume that the contents of the category will work ok once the Shorthand notation is recognized, so all we need to test is the shorthand
+	// The ones that are tested in their own sections are:
+	//		AccessSubject
+	//		Action
+	//		Resource
+	//		Environment 
 	// test Subject
 	@Test
-	public void testSubjectRequest() {
+	public void testCategoryShorthand() {
+	
+		// RecipientSubject present both as element within Category and as separate RecipientSubject element at same level as Category
+		try {
+			request = JSONRequest.load("{\"Request\" : {"
+					+ "\"Category\": ["
+						+ "{\"CategoryId\" : \"urn:oasis:names:tc:xacml:1.0:subject-category:recipient-subject\", \"Attribute\" : [{" +
+		    				"\"Id\" : \"document-id\", " +
+		    				"\"Value\"	: [ \"aValue\", \"aValue\", \"aValue\" ] " +
+						"}] }, "
+						+ "{\"CategoryId\" : \"urn:oasis:names:tc:xacml:1.0:subject-category:recipient-subject\", \"Attribute\" : [{" +
+		    				"\"Id\" : \"document-id\", " +
+		    				"\"Value\"	: \"aValue\"" +
+						"}] } "
+						+ "]," +
+					"\"RecipientSubject\" : { " +
+						"\"Attribute\": [ " +
+							"{ " +
+								"\"Id\" : \"subject-id\", " +
+								"\"Value\" : \"Andreas\" " +
+							"}, " +
+							"{ " +
+								"\"Id\" : \"location\", " +
+								"\"Value\" : \"Gamla Stan\" " +
+							"} " +
+						"] " +
+					"} " 
+				+ " }}");
+			assertEquals("{returnPolicyIdList=false,combinedDecision=false,requestAttributes=[{super={category=urn:oasis:names:tc:xacml:1.0:subject-category:recipient-subject,attributes=[{attributeId=document-id,category=urn:oasis:names:tc:xacml:1.0:subject-category:recipient-subject,values=[{dataTypeId=http://www.w3.org/2001/XMLSchema#string,value=aValue}{dataTypeId=http://www.w3.org/2001/XMLSchema#string,value=aValue}{dataTypeId=http://www.w3.org/2001/XMLSchema#string,value=aValue}],includeInResults=false}]}}{super={category=urn:oasis:names:tc:xacml:1.0:subject-category:recipient-subject,attributes=[{attributeId=document-id,category=urn:oasis:names:tc:xacml:1.0:subject-category:recipient-subject,values=[{dataTypeId=http://www.w3.org/2001/XMLSchema#string,value=aValue}],includeInResults=false}]}}{super={category=urn:oasis:names:tc:xacml:1.0:subject-category:recipient-subject,attributes=[{attributeId=subject-id,category=urn:oasis:names:tc:xacml:1.0:subject-category:recipient-subject,values=[{dataTypeId=http://www.w3.org/2001/XMLSchema#string,value=Andreas}],includeInResults=false}{attributeId=location,category=urn:oasis:names:tc:xacml:1.0:subject-category:recipient-subject,values=[{dataTypeId=http://www.w3.org/2001/XMLSchema#string,value=Gamla Stan}],includeInResults=false}]}}]}", request.toString());
+		} catch (Exception e) {
+			fail ("Failed convert from JSON to object: " + e);
+		}
 		
-		// Subject absent
+		
+		// IntermediarySubject present both as element within Category and as separate IntermediarySubject element at same level as Category
+		try {
+			request = JSONRequest.load("{\"Request\" : {"
+					+ "\"Category\": ["
+						+ "{\"CategoryId\" : \"urn:oasis:names:tc:xacml:1.0:subject-category:intermediary-subject\", \"Attribute\" : [{" +
+		    				"\"Id\" : \"document-id\", " +
+		    				"\"Value\"	: [ \"aValue\", \"aValue\", \"aValue\" ] " +
+						"}] }, "
+						+ "{\"CategoryId\" : \"urn:oasis:names:tc:xacml:1.0:subject-category:intermediary-subject\", \"Attribute\" : [{" +
+		    				"\"Id\" : \"document-id\", " +
+		    				"\"Value\"	: \"aValue\"" +
+						"}] } "
+						+ "]," +
+					"\"IntermediarySubject\" : { " +
+						"\"Attribute\": [ " +
+							"{ " +
+								"\"Id\" : \"subject-id\", " +
+								"\"Value\" : \"Andreas\" " +
+							"}, " +
+							"{ " +
+								"\"Id\" : \"location\", " +
+								"\"Value\" : \"Gamla Stan\" " +
+							"} " +
+						"] " +
+					"} " 
+				+ " }}");
+			assertEquals("{returnPolicyIdList=false,combinedDecision=false,requestAttributes=[{super={category=urn:oasis:names:tc:xacml:1.0:subject-category:intermediary-subject,attributes=[{attributeId=document-id,category=urn:oasis:names:tc:xacml:1.0:subject-category:intermediary-subject,values=[{dataTypeId=http://www.w3.org/2001/XMLSchema#string,value=aValue}{dataTypeId=http://www.w3.org/2001/XMLSchema#string,value=aValue}{dataTypeId=http://www.w3.org/2001/XMLSchema#string,value=aValue}],includeInResults=false}]}}{super={category=urn:oasis:names:tc:xacml:1.0:subject-category:intermediary-subject,attributes=[{attributeId=document-id,category=urn:oasis:names:tc:xacml:1.0:subject-category:intermediary-subject,values=[{dataTypeId=http://www.w3.org/2001/XMLSchema#string,value=aValue}],includeInResults=false}]}}{super={category=urn:oasis:names:tc:xacml:1.0:subject-category:intermediary-subject,attributes=[{attributeId=subject-id,category=urn:oasis:names:tc:xacml:1.0:subject-category:intermediary-subject,values=[{dataTypeId=http://www.w3.org/2001/XMLSchema#string,value=Andreas}],includeInResults=false}{attributeId=location,category=urn:oasis:names:tc:xacml:1.0:subject-category:intermediary-subject,values=[{dataTypeId=http://www.w3.org/2001/XMLSchema#string,value=Gamla Stan}],includeInResults=false}]}}]}", request.toString());
+		} catch (Exception e) {
+			fail ("Failed convert from JSON to object: " + e);
+		}
+		
+		
+		// Codebase present both as element within Category and as separate Codebase element at same level as Category
+		try {
+			request = JSONRequest.load("{\"Request\" : {"
+					+ "\"Category\": ["
+						+ "{\"CategoryId\" : \"urn:oasis:names:tc:xacml:1.0:subject-category:codebase\", \"Attribute\" : [{" +
+		    				"\"Id\" : \"document-id\", " +
+		    				"\"Value\"	: [ \"aValue\", \"aValue\", \"aValue\" ] " +
+						"}] }, "
+						+ "{\"CategoryId\" : \"urn:oasis:names:tc:xacml:1.0:subject-category:codebase\", \"Attribute\" : [{" +
+		    				"\"Id\" : \"document-id\", " +
+		    				"\"Value\"	: \"aValue\"" +
+						"}] } "
+						+ "]," +
+					"\"Codebase\" : { " +
+						"\"Attribute\": [ " +
+							"{ " +
+								"\"Id\" : \"subject-id\", " +
+								"\"Value\" : \"Andreas\" " +
+							"}, " +
+							"{ " +
+								"\"Id\" : \"location\", " +
+								"\"Value\" : \"Gamla Stan\" " +
+							"} " +
+						"] " +
+					"} " 
+				+ " }}");
+			assertEquals("{returnPolicyIdList=false,combinedDecision=false,requestAttributes=[{super={category=urn:oasis:names:tc:xacml:1.0:subject-category:codebase,attributes=[{attributeId=document-id,category=urn:oasis:names:tc:xacml:1.0:subject-category:codebase,values=[{dataTypeId=http://www.w3.org/2001/XMLSchema#string,value=aValue}{dataTypeId=http://www.w3.org/2001/XMLSchema#string,value=aValue}{dataTypeId=http://www.w3.org/2001/XMLSchema#string,value=aValue}],includeInResults=false}]}}{super={category=urn:oasis:names:tc:xacml:1.0:subject-category:codebase,attributes=[{attributeId=document-id,category=urn:oasis:names:tc:xacml:1.0:subject-category:codebase,values=[{dataTypeId=http://www.w3.org/2001/XMLSchema#string,value=aValue}],includeInResults=false}]}}{super={category=urn:oasis:names:tc:xacml:1.0:subject-category:codebase,attributes=[{attributeId=subject-id,category=urn:oasis:names:tc:xacml:1.0:subject-category:codebase,values=[{dataTypeId=http://www.w3.org/2001/XMLSchema#string,value=Andreas}],includeInResults=false}{attributeId=location,category=urn:oasis:names:tc:xacml:1.0:subject-category:codebase,values=[{dataTypeId=http://www.w3.org/2001/XMLSchema#string,value=Gamla Stan}],includeInResults=false}]}}]}", request.toString());
+		} catch (Exception e) {
+			fail ("Failed convert from JSON to object: " + e);
+		}
+		
+		
+		
+		// RequestingMachine present both as element within Category and as separate RequestingMachine element at same level as Category
+		try {
+			request = JSONRequest.load("{\"Request\" : {"
+					+ "\"Category\": ["
+						+ "{\"CategoryId\" : \"urn:oasis:names:tc:xacml:1.0:subject-category:requesting-machine\", \"Attribute\" : [{" +
+		    				"\"Id\" : \"document-id\", " +
+		    				"\"Value\"	: [ \"aValue\", \"aValue\", \"aValue\" ] " +
+						"}] }, "
+						+ "{\"CategoryId\" : \"urn:oasis:names:tc:xacml:1.0:subject-category:requesting-machine\", \"Attribute\" : [{" +
+		    				"\"Id\" : \"document-id\", " +
+		    				"\"Value\"	: \"aValue\"" +
+						"}] } "
+						+ "]," +
+					"\"RequestingMachine\" : { " +
+						"\"Attribute\": [ " +
+							"{ " +
+								"\"Id\" : \"subject-id\", " +
+								"\"Value\" : \"Andreas\" " +
+							"}, " +
+							"{ " +
+								"\"Id\" : \"location\", " +
+								"\"Value\" : \"Gamla Stan\" " +
+							"} " +
+						"] " +
+					"} " 
+				+ " }}");
+			assertEquals("{returnPolicyIdList=false,combinedDecision=false,requestAttributes=[{super={category=urn:oasis:names:tc:xacml:1.0:subject-category:requesting-machine,attributes=[{attributeId=document-id,category=urn:oasis:names:tc:xacml:1.0:subject-category:requesting-machine,values=[{dataTypeId=http://www.w3.org/2001/XMLSchema#string,value=aValue}{dataTypeId=http://www.w3.org/2001/XMLSchema#string,value=aValue}{dataTypeId=http://www.w3.org/2001/XMLSchema#string,value=aValue}],includeInResults=false}]}}{super={category=urn:oasis:names:tc:xacml:1.0:subject-category:requesting-machine,attributes=[{attributeId=document-id,category=urn:oasis:names:tc:xacml:1.0:subject-category:requesting-machine,values=[{dataTypeId=http://www.w3.org/2001/XMLSchema#string,value=aValue}],includeInResults=false}]}}{super={category=urn:oasis:names:tc:xacml:1.0:subject-category:requesting-machine,attributes=[{attributeId=subject-id,category=urn:oasis:names:tc:xacml:1.0:subject-category:requesting-machine,values=[{dataTypeId=http://www.w3.org/2001/XMLSchema#string,value=Andreas}],includeInResults=false}{attributeId=location,category=urn:oasis:names:tc:xacml:1.0:subject-category:requesting-machine,values=[{dataTypeId=http://www.w3.org/2001/XMLSchema#string,value=Gamla Stan}],includeInResults=false}]}}]}", request.toString());
+		} catch (Exception e) {
+			fail ("Failed convert from JSON to object: " + e);
+		}
+	}
+
+
+
+
+
+	
+
+
+	
+
+
+	
+	
+	
+	
+	
+	// test AccessSubject
+	// Include test for backward compatibility with "Subject"
+	@Test
+	public void testAccessSubjectRequest() {
+		
+		// AccessSubject absent
 		try {
 			request = JSONRequest.load("{\"Request\" : {\"Category\": [{\"CategoryId\" : \"custom-category\", \"Attribute\" : [{" +
 	    			"\"Id\" : \"document-id\", " +
@@ -198,7 +355,7 @@ public class RequestDefaultCategoryTest {
 			fail ("Failed convert from JSON to object: " + e);
 		}
 		
-		// Subject as normal element under Category (with CategoryId==subject category id)
+		// AccessSubject as normal element under Category (with CategoryId==subject category id)
 		try {
 			request = JSONRequest.load("{\"Request\" : {\"Category\": [{\"CategoryId\" : \"urn:oasis:names:tc:xacml:1.0:subject-category:access-subject\", \"Attribute\" : [{" +
 	    			"\"Id\" : \"document-id\", " +
@@ -209,7 +366,7 @@ public class RequestDefaultCategoryTest {
 			fail ("Failed convert from JSON to object: " + e);
 		}
 		
-		// multiple Subjects under Category
+		// multiple AccessSubjects under Category
 		try {
 			request = JSONRequest.load("{\"Request\" : {\"Category\": ["
 					+ "{\"CategoryId\" : \"urn:oasis:names:tc:xacml:1.0:subject-category:access-subject\", \"Attribute\" : [{" +
@@ -226,7 +383,7 @@ public class RequestDefaultCategoryTest {
 			fail ("Failed convert from JSON to object: " + e);
 		}
 		
-		// Subject present both as element within Category and as separate Subject element at same level as Category
+		// AccessSubject present both as element within Category and as separate AccessSubject element at same level as Category
 		try {
 			request = JSONRequest.load("{\"Request\" : {"
 					+ "\"Category\": ["
@@ -239,7 +396,7 @@ public class RequestDefaultCategoryTest {
 		    				"\"Value\"	: \"aValue\"" +
 						"}] } "
 						+ "]," +
-					"\"Subject\" : { " +
+					"\"AccessSubject\" : { " +
 						"\"Attribute\": [ " +
 							"{ " +
 								"\"Id\" : \"subject-id\", " +
@@ -257,7 +414,30 @@ public class RequestDefaultCategoryTest {
 			fail ("Failed convert from JSON to object: " + e);
 		}
 		
-		// Subject present, no other Category element
+		// AccessSubject present, no other Category element
+		try {
+			request = JSONRequest.load("{\"Request\" : {"
+					+ 
+					"\"AccessSubject\" : { " +
+						"\"Attribute\": [ " +
+							"{ " +
+								"\"Id\" : \"subject-id\", " +
+								"\"Value\" : \"Andreas\" " +
+							"}, " +
+							"{ " +
+								"\"Id\" : \"location\", " +
+								"\"Value\" : \"Gamla Stan\" " +
+							"} " +
+						"] " +
+					"} " 
+				+ " }}");
+			assertEquals("{returnPolicyIdList=false,combinedDecision=false,requestAttributes=[{super={category=urn:oasis:names:tc:xacml:1.0:subject-category:access-subject,attributes=[{attributeId=subject-id,category=urn:oasis:names:tc:xacml:1.0:subject-category:access-subject,values=[{dataTypeId=http://www.w3.org/2001/XMLSchema#string,value=Andreas}],includeInResults=false}{attributeId=location,category=urn:oasis:names:tc:xacml:1.0:subject-category:access-subject,values=[{dataTypeId=http://www.w3.org/2001/XMLSchema#string,value=Gamla Stan}],includeInResults=false}]}}]}", request.toString());
+		} catch (Exception e) {
+			fail ("Failed convert from JSON to object: " + e);
+		}
+		
+		
+		// Subject present, no other Category element (Backward Compatibility
 		try {
 			request = JSONRequest.load("{\"Request\" : {"
 					+ 
@@ -279,7 +459,7 @@ public class RequestDefaultCategoryTest {
 			fail ("Failed convert from JSON to object: " + e);
 		}
 		
-		// Subject present, 1/multiple other Category element also present
+		// AccessSubject present, 1/multiple other Category element also present
 		try {
 			request = JSONRequest.load("{\"Request\" : {"
 					+ "\"Category\": ["
@@ -288,7 +468,7 @@ public class RequestDefaultCategoryTest {
 		    				"\"Value\"	: \"aValue\"" +
 						"}] } "
 						+ "]," +
-					"\"Subject\" : { " +
+					"\"AccessSubject\" : { " +
 						"\"Attribute\": [ " +
 							"{ " +
 								"\"Id\" : \"subject-id\", " +
@@ -306,11 +486,11 @@ public class RequestDefaultCategoryTest {
 			fail ("Failed convert from JSON to object: " + e);
 		}
 		
-		// 2 Subjects - duplicates fail
+		// 2 AccessSubjects - duplicates fail
 		try {
 			request = JSONRequest.load("{\"Request\" : {"
 					+ 
-					"\"Subject\" : { " +
+					"\"AccessSubject\" : { " +
 						"\"Attribute\": [ " +
 							"{ " +
 								"\"Id\" : \"subject-id\", " +
@@ -323,7 +503,7 @@ public class RequestDefaultCategoryTest {
 						"] " +
 					"} " 
 					+ 
-					"\"Subject\" : { " +
+					"\"AccessSubject\" : { " +
 						"\"Attribute\": [ " +
 							"{ " +
 								"\"Id\" : \"subject-id\", " +
@@ -343,11 +523,11 @@ public class RequestDefaultCategoryTest {
 			fail ("Failed convert from JSON to object: " + e);
 		}
 		
-		// Subject with correct Category value
+		// AccessSubject with correct Category value
 		try {
 			request = JSONRequest.load("{\"Request\" : {"
 					+ 
-					"\"Subject\" : { " +
+					"\"AccessSubject\" : { " +
 						"\"CategoryId\" : \"urn:oasis:names:tc:xacml:1.0:subject-category:access-subject\" ," +
 						"\"Attribute\": [ " +
 							"{ " +
@@ -366,11 +546,11 @@ public class RequestDefaultCategoryTest {
 			fail ("Failed convert from JSON to object: " + e);
 		}
 		
-		// Subject with wrong Category value
+		// AccessSubject with wrong Category value
 		try {
 			request = JSONRequest.load("{\"Request\" : {"
 					+ 
-					"\"Subject\" : { " +
+					"\"AccessSubject\" : { " +
 						"\"CategoryId\" : \"notthesubject\" ," +
 						"\"Attribute\": [ " +
 							"{ " +
@@ -391,11 +571,11 @@ public class RequestDefaultCategoryTest {
 			fail ("Failed convert from JSON to object: " + e);
 		}
 		
-		// Subject with array of sub-object Subjects (Multi Decision)
+		// AccessSubject with array of sub-object AccessSubjects (Multi Decision)
 		try {
 			request = JSONRequest.load("{\"Request\" : {"
 					+ 
-					"\"Subject\" : ["
+					"\"AccessSubject\" : ["
 					+ "{ " +
 						"\"Attribute\": [ " +
 							"{ " +
@@ -449,7 +629,7 @@ public class RequestDefaultCategoryTest {
 	
 	
 	
-	// Action ... duplicate all Action tests...
+	// Action ... duplicate all AccessSubject tests...
 	// test Action
 	@Test
 	public void testActionRequest() {
@@ -711,7 +891,7 @@ public class RequestDefaultCategoryTest {
 	
 	
 	
-	// Resource ... duplicate all Resource tests...
+	// Resource ... duplicate all AccessSubject tests...
 	// test Resource
 	@Test
 	public void testResourceRequest() {
@@ -975,7 +1155,7 @@ public class RequestDefaultCategoryTest {
 	
 	
 	
-	// Environment ... duplicate all Environment tests ...
+	// Environment ... duplicate all AccessSubject tests ...
 	// test Environment
 	@Test
 	public void testEnvironmentRequest() {

@@ -18,6 +18,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -59,8 +60,8 @@ public class StdPolicyFinderFactory extends PolicyFinderFactory {
 	 * @param policyId the <code>String</code> identifier for the policy
 	 * @return a <code>PolicyDef</code> loaded from the given identifier
 	 */
-	protected PolicyDef loadPolicyDef(String policyId) {
-		String propLocation	= XACMLProperties.getProperty(policyId + PROP_FILE);
+	protected PolicyDef loadPolicyDef(String policyId, Properties properties) {
+		String propLocation	= properties.getProperty(policyId + PROP_FILE);
 		if (propLocation != null) {
 			File fileLocation	= new File(propLocation);
 			if (!fileLocation.exists()) {
@@ -81,7 +82,7 @@ public class StdPolicyFinderFactory extends PolicyFinderFactory {
 			}
 		}
 		
-		if ((propLocation = XACMLProperties.getProperty(policyId + PROP_URL)) != null) {
+		if ((propLocation = properties.getProperty(policyId + PROP_URL)) != null) {
 			 InputStream is = null;
 			try {
 				URL url						= new URL(propLocation);
@@ -121,8 +122,8 @@ public class StdPolicyFinderFactory extends PolicyFinderFactory {
 	 * @param propertyName the <code>String</code> name of the property containing the list of policy identifiers
 	 * @return a <code>List</code> of <code>PolicyDef</code>s loaded from the given property name
 	 */
-	protected List<PolicyDef> getPolicyDefs(String propertyName) {
-		String policyIds	= XACMLProperties.getProperty(propertyName);
+	protected List<PolicyDef> getPolicyDefs(String propertyName, Properties properties) {
+		String policyIds	= properties.getProperty(propertyName);
 		if (policyIds == null || policyIds.length() == 0) {
 			return null;
 		}
@@ -134,7 +135,7 @@ public class StdPolicyFinderFactory extends PolicyFinderFactory {
 		
 		List<PolicyDef> listPolicyDefs	= new ArrayList<PolicyDef>();
 		for (String policyId : policyIdArray) {
-			PolicyDef policyDef	= this.loadPolicyDef(policyId);	
+			PolicyDef policyDef	= this.loadPolicyDef(policyId, properties);	
 			if (policyDef != null) {
 				listPolicyDefs.add(policyDef);
 			}
@@ -142,10 +143,10 @@ public class StdPolicyFinderFactory extends PolicyFinderFactory {
 		return listPolicyDefs;
 	}
 	
-	protected synchronized void init() {
+	protected synchronized void init(Properties properties) {
 		if (this.needsInit) {
-			this.rootPolicies		= this.getPolicyDefs(XACMLProperties.PROP_ROOTPOLICIES);
-			this.referencedPolicies	= this.getPolicyDefs(XACMLProperties.PROP_REFERENCEDPOLICIES);
+			this.rootPolicies		= this.getPolicyDefs(XACMLProperties.PROP_ROOTPOLICIES, properties);
+			this.referencedPolicies	= this.getPolicyDefs(XACMLProperties.PROP_REFERENCEDPOLICIES, properties);
 			this.needsInit	= false;
 		}
 	}
@@ -153,9 +154,22 @@ public class StdPolicyFinderFactory extends PolicyFinderFactory {
 	public StdPolicyFinderFactory() {
 	}
 
+	public StdPolicyFinderFactory(Properties properties) {
+	}
+
 	@Override
 	public PolicyFinder getPolicyFinder() throws FactoryException {
-		this.init();
+		try {
+			this.init(XACMLProperties.getProperties());
+		} catch (IOException e) {
+			throw new FactoryException(e);
+		}
 		return new StdPolicyFinder(this.rootPolicies, this.referencedPolicies);
+	}
+
+	@Override
+	public PolicyFinder getPolicyFinder(Properties properties) throws FactoryException {
+		this.init(properties);
+		return new StdPolicyFinder(this.rootPolicies, this.referencedPolicies, properties);
 	}	
 }

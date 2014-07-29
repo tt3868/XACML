@@ -10,8 +10,12 @@
  */
 package com.att.research.xacml.std.pip.finders;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.att.research.xacml.api.Status;
@@ -147,5 +151,21 @@ public class RequestFinder extends WrappingFinder {
 		} finally {
 			//System.out.println("RequestFinder.getAttributesInternal() = " + (tEnd - tStart));
 		}
+	}
+
+	@Override
+	public Collection<PIPEngine> getPIPEngines() {
+		List<PIPEngine>	engines = new ArrayList<PIPEngine>();
+		if (this.requestEngine != null) {
+			engines.add(this.requestEngine);
+		}
+		if (this.environmentEngine != null) {
+			engines.add(this.environmentEngine);
+		}
+		PIPFinder wrappedFinder = this.getWrappedFinder();
+		if (wrappedFinder != null) {
+			engines.addAll(wrappedFinder.getPIPEngines());
+		}
+		return Collections.unmodifiableList(engines);
 	}
 }

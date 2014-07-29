@@ -10,13 +10,15 @@
  */
 package com.att.research.xacml.api.pap;
 
+import java.util.Properties;
+
 import com.att.research.xacml.util.FactoryException;
 import com.att.research.xacml.util.FactoryFinder;
+import com.att.research.xacml.util.XACMLProperties;
 
 public abstract class PAPEngineFactory {
-	// Default to the PAP version of the PAP Engine, not the RESTful version
-//	private static final String	FACTORYID	= XACMLProperties.PROP_PAP_PAPENGINEFACTORY;
-//	private static final String	DEFAULT_FACTORY_CLASSNAME	= "com.att.research.xacml.std.pap.StdEngineFactory";
+	private static final String	FACTORYID	= XACMLProperties.PROP_PAP_PAPENGINEFACTORY;
+	private static final String	DEFAULT_FACTORY_CLASSNAME	= "com.att.research.xacml.std.pap.StdEngineFactory";
 	
 	/**
 	 * The constructor is protected to prevent instantiation of the class.
@@ -24,24 +26,33 @@ public abstract class PAPEngineFactory {
 	protected PAPEngineFactory() {
 	}
 	
-//
-// Because there are 2 types of PAPEngine (the PAP version that works with files and the AC RESTful version that uses
-// a RESTful interface to communicate with the PAP servlet) it is important for the caller to know which kind
-// they are working with.
-// Also, the AC RESTfulPAPEngine cannot be found by the default XACML FactoryFinder because it is packaged in a WAR file
-// that is not part of the base code.
-// To reduce confusion we do not provide a default PAPEngineFactory.  The calling code must explicitly identify which one they want.
-// When getting the RESTfulPAPEngineFactory the caller must also include an appropriate ClassLoader.
-//
-//	/**
-//	 * Creates a new <code>PAPEngineFactory</code> instance by examining initialization resources from
-//	 * various places to determine the class to instantiate and return.
-//	 * 
-//	 * @return an instance of an object that extends <code>PAPEngineFactory</code> to use in creating <code>PAPEngine</code> objects.
-//	 */
-//	public static PAPEngineFactory newInstance() throws FactoryException {
-//		return FactoryFinder.find(FACTORYID, DEFAULT_FACTORY_CLASSNAME, PAPEngineFactory.class);
-//	}
+	/**
+	 * The constructor is protected to prevent instantiation of the class.
+	 */
+	protected PAPEngineFactory(Properties properties) {
+	}
+	
+	/**
+	 * Creates a new <code>PAPEngineFactory</code> instance by examining initialization resources from
+	 * various places to determine the class to instantiate and return.
+	 * 
+	 * @return an instance of an object that extends <code>PAPEngineFactory</code> to use in creating <code>PAPEngine</code> objects.
+	 * @throws FactoryException
+	 */
+	public static PAPEngineFactory newInstance() throws FactoryException {
+		return FactoryFinder.find(FACTORYID, DEFAULT_FACTORY_CLASSNAME, PAPEngineFactory.class);
+	}
+	
+	/**
+	 * Creates a new <code>PAPEngineFactory</code> instance by examining initialization resources from
+	 * various places to determine the class to instantiate and return.
+	 * 
+	 * @return an instance of an object that extends <code>PAPEngineFactory</code> to use in creating <code>PAPEngine</code> objects.
+	 * @throws FactoryException
+	 */
+	public static PAPEngineFactory newInstance(Properties properties) throws FactoryException {
+		return FactoryFinder.find(FACTORYID, DEFAULT_FACTORY_CLASSNAME, PAPEngineFactory.class, properties);
+	}
 	
 	/**
 	 * Creates a new <code>PAPEngineFactory</code> instance using the given class name and <code>ClassLoader</code>.  If the
@@ -68,10 +79,16 @@ public abstract class PAPEngineFactory {
 	/**
 	 * Creates a new <code>PAPEngine</code> based on the configured <code>PAPEngineFactory</code>.
 	 * 
-	 * @param myURLString - optional parameter needed by some PAPEngines and not others
 	 * @return a new <code>PAPEngine</code>
 	 * @throws PAPException 
 	 */
-	public abstract PAPEngine newEngine(String myURLString) throws FactoryException, PAPException;
-
+	public abstract PAPEngine newEngine() throws FactoryException, PAPException;
+	
+	/**
+	 * Creates a new <code>PAPEngine</code> based on the configured <code>PAPEngineFactory</code>.
+	 * 
+	 * @return a new <code>PAPEngine</code>
+	 * @throws PAPException 
+	 */
+	public abstract PAPEngine newEngine(Properties properties) throws FactoryException, PAPException;
 }

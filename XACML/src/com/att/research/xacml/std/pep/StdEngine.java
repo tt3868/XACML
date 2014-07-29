@@ -10,6 +10,8 @@
  */
 package com.att.research.xacml.std.pep;
 
+import java.util.Properties;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -33,7 +35,13 @@ import com.att.research.xacml.util.FactoryException;
 public class StdEngine implements PEPEngine {
 	private Log	logger	= LogFactory.getLog(this.getClass());
 	
+	protected Properties properties = null;
+	
 	public StdEngine() {
+	}
+
+	public StdEngine(Properties properties) {
+		this.properties = properties;
 	}
 
 	@Override

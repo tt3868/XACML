@@ -11,6 +11,8 @@
 package com.att.research.xacml.std.pip.finders;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -101,5 +103,16 @@ public class EngineFinder implements PIPFinder {
 	@Override
 	public PIPResponse getMatchingAttributes(PIPRequest pipRequest, PIPEngine exclude) throws PIPException {
 		return StdPIPResponse.getMatchingResponse(pipRequest, this.getAttributes(pipRequest, exclude));
+	}
+
+	@Override
+	public Collection<PIPEngine> getPIPEngines() {
+		List<PIPEngine> engines = new ArrayList<PIPEngine>();
+		for (List<PIPEngine> list : this.pipEngines.values()) {
+			for (PIPEngine engine : list) {
+				engines.add(engine);
+			}
+		}
+		return Collections.unmodifiableList(engines);
 	}
 }

@@ -225,7 +225,7 @@ public class Conformance {
 		this.testEngine	= new ConformanceTestEngine(this.getScopeResolver(), lenientRequests, lenientPolicies, iterations);
 
 		if (testSetDirectoryNames.length() == 0) {
-			System.err.println("No test set directory given (need -i or --input command line option)");
+			System.err.println("No test set directory given (need -i or --iniput command line option)");
 			return false;
 		}
 		if (testSet.getListConformanceTests().size() == 0) {

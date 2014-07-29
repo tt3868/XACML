@@ -10,6 +10,8 @@
  */
 package com.att.research.xacmlatt.pdp;
 
+import java.util.Properties;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -40,5 +42,15 @@ public class ATTPDPEngineFactory extends PDPEngineFactory {
 			throw new FactoryException("Null EvaluationContextFactory");
 		}
 		return new ATTPDPEngine(evaluationContextFactory, this.getDefaultBehavior(), this.getScopeResolver());
+	}
+
+	@Override
+	public PDPEngine newEngine(Properties properties) throws FactoryException {
+		EvaluationContextFactory evaluationContextFactory	= EvaluationContextFactory.newInstance(properties);
+		if (evaluationContextFactory == null) {
+			this.logger.error("Null EvaluationContextFactory");
+			throw new FactoryException("Null EvaluationContextFactory");
+		}
+		return new ATTPDPEngine(evaluationContextFactory, this.getDefaultBehavior(), this.getScopeResolver(), properties);
 	}	
 }

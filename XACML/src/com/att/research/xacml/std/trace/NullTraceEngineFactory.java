@@ -10,6 +10,8 @@
  */
 package com.att.research.xacml.std.trace;
 
+import java.util.Properties;
+
 import com.att.research.xacml.api.trace.TraceEngine;
 import com.att.research.xacml.api.trace.TraceEngineFactory;
 
@@ -27,9 +29,19 @@ public class NullTraceEngineFactory extends TraceEngineFactory {
 	public NullTraceEngineFactory() {
 	}
 
+	/**
+	 * Creates a new <code>NullTraceEngineFactory</code>
+	 */
+	public NullTraceEngineFactory(Properties properties) {
+	}
+
 	@Override
 	public TraceEngine getTraceEngine() {
 		return NullTraceEngine.newInstance();
 	}
 
+	@Override
+	public TraceEngine getTraceEngine(Properties properties) {
+		return NullTraceEngine.newInstance(properties);
+	}
 }

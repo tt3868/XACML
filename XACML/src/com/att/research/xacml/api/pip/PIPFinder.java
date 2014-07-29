@@ -10,6 +10,8 @@
  */
 package com.att.research.xacml.api.pip;
 
+import java.util.Collection;
+
 /**
  * PIPFinder is the interface objects implement that can query multiple sources of {@link com.att.research.xacml.api.Attribute}s based
  * on a {@link com.att.research.xacml.api.pip.PIPRequest}.
@@ -68,4 +70,6 @@ public interface PIPFinder {
 	 * @throws PIPException
 	 */
 	public PIPResponse getMatchingAttributes(PIPRequest pipRequest, PIPEngine exclude, PIPFinder pipFinderParent) throws PIPException;
+	
+	public Collection<PIPEngine>	getPIPEngines();
 }

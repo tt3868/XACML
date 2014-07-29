@@ -11,6 +11,8 @@
 
 package com.att.research.xacml.api.trace;
 
+import java.util.Properties;
+
 import com.att.research.xacml.util.FactoryException;
 import com.att.research.xacml.util.FactoryFinder;
 import com.att.research.xacml.util.XACMLProperties;
@@ -26,7 +28,13 @@ public abstract class TraceEngineFactory {
 	private static final String	FACTORYID					= XACMLProperties.PROP_TRACEENGINEFACTORY;
 	private static final String	DEFAULT_FACTORY_CLASSNAME	= "com.att.research.xacml.std.trace.NullTraceEngineFactory";
 	
+	protected Properties properties = null;
+	
 	protected TraceEngineFactory() {
+	}
+	
+	protected TraceEngineFactory(Properties properties) {
+		this.properties = properties;
 	}
 	
 	/**
@@ -38,6 +46,17 @@ public abstract class TraceEngineFactory {
 	 */
 	public static TraceEngineFactory newInstance() throws FactoryException {
 		return FactoryFinder.find(FACTORYID, DEFAULT_FACTORY_CLASSNAME, TraceEngineFactory.class);
+	}
+	
+	/**
+	 * Gets an instance of the <code>TraceEngineFactory</code> class using standard factory lookup methods defined by
+	 * the {@link com.att.research.xacml.util.FactoryFinder} class.
+	 * 
+	 * @return an instance of the <code>TraceEngineFactory</code> class.
+	 * @throws FactoryException if there is an error finding a <code>TraceEngineFactory</code>
+	 */
+	public static TraceEngineFactory newInstance(Properties properties) throws FactoryException {
+		return FactoryFinder.find(FACTORYID, DEFAULT_FACTORY_CLASSNAME, TraceEngineFactory.class, properties);
 	}
 	
 	/**
@@ -70,5 +89,11 @@ public abstract class TraceEngineFactory {
 	 * @return an instance of the <code>TraceEngine</code> interface
 	 */
 	public abstract TraceEngine getTraceEngine();
-
+	
+	/**
+	 * Gets an instance of the {@link com.att.research.xacml.api.trace.TraceEngine} interface to use for posting {@link com.att.research.xacml.api.trace.TraceEvent}s.
+	 * 
+	 * @return an instance of the <code>TraceEngine</code> interface
+	 */
+	public abstract TraceEngine getTraceEngine(Properties properties);
 }

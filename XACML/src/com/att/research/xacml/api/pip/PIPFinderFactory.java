@@ -10,6 +10,8 @@
  */
 package com.att.research.xacml.api.pip;
 
+import java.util.Properties;
+
 import com.att.research.xacml.util.FactoryException;
 import com.att.research.xacml.util.FactoryFinder;
 import com.att.research.xacml.util.XACMLProperties;
@@ -24,7 +26,19 @@ public abstract class PIPFinderFactory {
 	private static final String	FACTORYID					= XACMLProperties.PROP_PIPFINDERFACTORY;
 	private static final String	DEFAULT_FACTORY_CLASSNAME	= "com.att.research.xacml.std.pip.StdPIPFinderFactory";
 	
+	protected Properties properties = null;
+	
+	/**
+	 * Protected constructor so this class cannot be instantiated.
+	 */
 	protected PIPFinderFactory() {
+	}
+
+	/**
+	 * Protected constructor so this class cannot be instantiated.
+	 */
+	protected PIPFinderFactory(Properties properties) {
+		this.properties = properties;
 	}
 
 	/**
@@ -35,6 +49,10 @@ public abstract class PIPFinderFactory {
 	 */
 	public static PIPFinderFactory newInstance() throws FactoryException {
 		return FactoryFinder.find(FACTORYID, DEFAULT_FACTORY_CLASSNAME, PIPFinderFactory.class);
+	}
+	
+	public static PIPFinderFactory newInstance(Properties properties) throws FactoryException {
+		return FactoryFinder.find(FACTORYID, DEFAULT_FACTORY_CLASSNAME, PIPFinderFactory.class, properties);
 	}
 	
 	public static PIPFinderFactory newInstance(String factoryClassName, ClassLoader classLoader) throws FactoryException {
@@ -51,4 +69,11 @@ public abstract class PIPFinderFactory {
 	 * @return an instance of the configured <code>PIPFinder</code>
 	 */
 	abstract public PIPFinder getFinder() throws PIPException ;
+
+	/**
+	 * Gets an instance of the configured <code>PIPFinder</code> class.
+	 * 
+	 * @return an instance of the configured <code>PIPFinder</code>
+	 */
+	abstract public PIPFinder getFinder(Properties properties) throws PIPException ;
 }

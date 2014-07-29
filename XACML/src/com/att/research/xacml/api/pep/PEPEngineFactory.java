@@ -11,6 +11,8 @@
 
 package com.att.research.xacml.api.pep;
 
+import java.util.Properties;
+
 import com.att.research.xacml.util.FactoryException;
 import com.att.research.xacml.util.FactoryFinder;
 import com.att.research.xacml.util.XACMLProperties;
@@ -32,6 +34,12 @@ public abstract class PEPEngineFactory {
 	}
 	
 	/**
+	 * The constructor is protected to prevent instantiation of the class.
+	 */
+	protected PEPEngineFactory(Properties properties) {
+	}
+	
+	/**
 	 * Creates a new <code>PEPEngineFactory</code> instance by examining initialization resources from
 	 * various places to determine the class to instantiate and return.
 	 * 
@@ -39,6 +47,17 @@ public abstract class PEPEngineFactory {
 	 */
 	public static PEPEngineFactory newInstance() throws FactoryException {
 		return FactoryFinder.find(FACTORYID, DEFAULT_FACTORY_CLASSNAME, PEPEngineFactory.class);
+	}
+	
+	
+	/**
+	 * Creates a new <code>PEPEngineFactory</code> instance by examining initialization resources from
+	 * various places to determine the class to instantiate and return.
+	 * 
+	 * @return an instance of an object that extends <code>PEPEngineFactory</code> to use in creating <code>PEPEngine</code> objects.
+	 */
+	public static PEPEngineFactory newInstance(Properties properties) throws FactoryException {
+		return FactoryFinder.find(FACTORYID, DEFAULT_FACTORY_CLASSNAME, PEPEngineFactory.class, properties);
 	}
 	
 	/**
@@ -69,4 +88,11 @@ public abstract class PEPEngineFactory {
 	 * @return a new <code>PEPEngine</code>
 	 */
 	public abstract PEPEngine newEngine() throws PEPException;
+	
+	/**
+	 * Creates a new <code>PEPEngine</code> based on the configured <code>PEPEngineFactory</code>.
+	 * 
+	 * @return a new <code>PEPEngine</code>
+	 */
+	public abstract PEPEngine newEngine(Properties properties) throws PEPException;
 }

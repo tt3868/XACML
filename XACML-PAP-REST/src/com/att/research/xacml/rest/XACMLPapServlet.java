@@ -137,7 +137,7 @@ public class XACMLPapServlet extends HttpServlet implements StdItemSetChangeList
 			//
 			// The factory knows how to go about creating a PAP Engine
 			//
-			this.papEngine = factory.newEngine(null);			
+			this.papEngine = factory.newEngine();			
 			//
 			// we are about to call the PDPs and give them their configuration.
 			// To do that we need to have the URL of this PAP so we can construct the Policy file URLs
@@ -1371,7 +1371,11 @@ public class XACMLPapServlet extends HttpServlet implements StdItemSetChangeList
 	            // So we need to handle this ourselves.
 	            //
 	//TODO - is this needed for a PUT?  seems better to leave in for now?
-	            connection.setInstanceFollowRedirects(false);
+//	            connection.setInstanceFollowRedirects(false);
+	            //
+	            // PLD - MUST be able to handle re-directs.
+	            //
+	            connection.setInstanceFollowRedirects(true);
 				connection.setDoOutput(true);
 	//			connection.setDoInput(true);
 	    		try (OutputStream os = connection.getOutputStream()) {

@@ -10,6 +10,9 @@
  */
 package com.att.research.xacmlatt.pdp.std;
 
+import java.util.Collection;
+import java.util.Properties;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -42,6 +45,7 @@ import com.att.research.xacmlatt.pdp.policy.PolicySet;
  */
 public class StdEvaluationContext implements EvaluationContext {
 	private Log logger	= LogFactory.getLog(this.getClass());
+	private Properties properties;
 	private Request request;
 	private RequestFinder requestFinder;
 	private PolicyFinder policyFinder;
@@ -54,14 +58,19 @@ public class StdEvaluationContext implements EvaluationContext {
 	 * @param requestIn the <code>Request</code>
 	 * @param policyDef the <code>PolicyDef</code>
 	 */
-	public StdEvaluationContext(Request requestIn, PolicyFinder policyFinderIn, PIPFinder pipFinder, TraceEngine traceEngineIn) {
+	public StdEvaluationContext(Request requestIn, PolicyFinder policyFinderIn, PIPFinder pipFinder, TraceEngine traceEngineIn, Properties properties) {
+		this.properties		= properties;
 		this.request		= requestIn;
 		this.policyFinder	= policyFinderIn;
 		if (traceEngineIn != null) {
 			this.traceEngine	= traceEngineIn;
 		} else {
 			try {
-				this.traceEngine	= TraceEngineFactory.newInstance().getTraceEngine();
+				if (this.properties == null) {
+					this.traceEngine	= TraceEngineFactory.newInstance().getTraceEngine();
+				} else {
+					this.traceEngine	= TraceEngineFactory.newInstance(this.properties).getTraceEngine(this.properties);
+				}
 			} catch (FactoryException ex) {
 				this.logger.error("FactoryException creating TraceEngine: " + ex.toString(), ex);
 			}
@@ -76,6 +85,10 @@ public class StdEvaluationContext implements EvaluationContext {
 				this.requestFinder	= new RequestFinder(pipFinder, new RequestEngine(requestIn));
 			}
 		}
+	}
+	
+	public StdEvaluationContext(Request requestIn, PolicyFinder policyFinderIn, PIPFinder pipFinder, TraceEngine traceEngineIn) {
+		this(requestIn, policyFinderIn, pipFinder, traceEngineIn, null);
 	}
 	
 	public StdEvaluationContext(Request requestIn, PolicyFinder policyFinderIn, PIPFinder pipFinder) {
@@ -137,5 +150,10 @@ public class StdEvaluationContext implements EvaluationContext {
 	@Override
 	public PIPResponse getMatchingAttributes(PIPRequest pipRequest, PIPEngine exclude, PIPFinder pipFinderParent) throws PIPException {
 		return this.requestFinder.getMatchingAttributes(pipRequest, exclude, pipFinderParent);
+	}
+
+	@Override
+	public Collection<PIPEngine> getPIPEngines() {
+		return this.requestFinder.getPIPEngines();
 	}
 }

@@ -88,7 +88,7 @@ public class RequestMainTest {
 					    "} " +
 					"], " +
 					    
-					"\"Subject\":{ " +
+					"\"AccessSubject\":{ " +
 						"\"Content\" : \"<?xml version=\\\"1.0\\\"?><catalog>" + 
 							"<book id=\\\"bk101\\\"><author>Gambardella, Matthew</author><title>XML Developer's Guide</title><genre>Computer</genre>" +
 							"<price>44.95</price><publish_date>2000-10-01</publish_date><description>An in-depth look at creating applications with XML.</description>"+
@@ -112,7 +112,7 @@ public class RequestMainTest {
 	 */
 	String exampleFromSpec = "{ " +
 			"\"Request\" : { " +
-				"\"Subject\" : { " +
+				"\"AccessSubject\" : { " +
 					"\"Attribute\": [ " +
 						"{ " +
 							"\"Id\" : \"subject-id\", " +
@@ -562,9 +562,9 @@ public class RequestMainTest {
 			fail ("Failed convert from JSON to object: " + e);
 		}
 		
-		// Subject
+		// AccessSubject
 		try {
-			request = JSONRequest.load((String)"{\"Request\" : { \"Subject\":{ }}}");
+			request = JSONRequest.load((String)"{\"Request\" : { \"AccessSubject\":{ }}}");
 			assertEquals("{returnPolicyIdList=false,combinedDecision=false,requestAttributes=[{super={category=urn:oasis:names:tc:xacml:1.0:subject-category:access-subject}}]}", request.toString());
 		} catch (Exception e) {
 			fail ("Failed convert from JSON to object: " + e);
@@ -951,9 +951,9 @@ public class RequestMainTest {
 		}
 		
 		
-		// Subject
+		// AccessSubject
 		try {
-			request = JSONRequest.load((String)"{\"Request\" : { \"Subject\":{ }, \"Subject\":{ }}}");
+			request = JSONRequest.load((String)"{\"Request\" : { \"AccessSubject\":{ }, \"AccessSubject\":{ }}}");
 			fail("Unknown element should throw exception");
 		} catch (JSONStructureException e) {
 			// correct response

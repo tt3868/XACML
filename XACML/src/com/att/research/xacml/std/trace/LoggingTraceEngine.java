@@ -10,6 +10,8 @@
  */
 package com.att.research.xacml.std.trace;
 
+import java.util.Properties;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -32,12 +34,24 @@ public class LoggingTraceEngine implements TraceEngine {
 	protected LoggingTraceEngine() {
 	}
 	
+	protected LoggingTraceEngine(Properties properties) {
+	}
+	
 	/**
 	 * Gets the single instance of the <code>LoggingTraceEngine</code>.
 	 * 
 	 * @return the single instance of the <code>LoggingTraceEngine</code>.
 	 */
 	public static LoggingTraceEngine newInstance() {
+		return loggingTraceEngine;
+	}
+
+	/**
+	 * Gets the single instance of the <code>LoggingTraceEngine</code>.
+	 * 
+	 * @return the single instance of the <code>LoggingTraceEngine</code>.
+	 */
+	public static LoggingTraceEngine newInstance(Properties properties) {
 		return loggingTraceEngine;
 	}
 

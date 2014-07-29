@@ -154,6 +154,12 @@ public class JDBCEngine extends StdConfigurableEngine {
 		PreparedStatement preparedStatement	= jdbcResolver.getPreparedStatement(this, pipRequest, pipFinder, connection);
 		if (preparedStatement == null) {
 			this.logger.debug(this.getName() + " does not handle " + pipRequest.toString());
+			try {
+				if (connection != null) {
+					connection.close();
+				}
+			} catch (Exception e) {				
+			}
 			return;
 		}
 		
@@ -181,6 +187,12 @@ public class JDBCEngine extends StdConfigurableEngine {
 				preparedStatement.close();
 			} catch (SQLException e) {
 				this.logger.error("SQLException closing preparedStatment: " + e.toString(), e);
+			}
+			try {
+				if (connection != null) {
+					connection.close();
+				}
+			} catch (Exception e) {				
 			}
 			return;
 		}		

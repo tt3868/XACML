@@ -126,4 +126,12 @@ public class XACMLRestProperties extends XACMLProperties {
 	 * @see #PROP_ADMIN_USER_NAME for more information.
 	 */
 	public static final String	PROP_ADMIN_USER_EMAIL = "xacml.rest.admin.user.email";
+	/**
+	 * Directory path containing sub-directories where the Subscriber servlet puts files sent through data feeds.
+	 */
+	public static final String	PROP_SUBSCRIBER_INCOMING = "xacml.subscriber.incoming";
+	/**
+	 * The specific data feed name for the Subscriber servlet to register for.
+	 */
+	public static final String	PROP_SUBSCRIBER_FEED = "xacml.subscriber.feed";
 }

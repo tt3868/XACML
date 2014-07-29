@@ -85,10 +85,9 @@ public class HyperCSVEngine extends JDBCEngine {
 			this.target = this.target.substring(0, this.target.indexOf('.'));
 			this.logger.info("Target set to '" + this.target + "'");
 		}
-		
-		//early initialization approach ..
-		//hyperInit();
-		//or
+		//
+		// early initialization
+		//
 		try {
 			getConnection().close();
 		}
@@ -98,7 +97,7 @@ public class HyperCSVEngine extends JDBCEngine {
 	}
 
 	/*
-	 * Late initialiation approach ..
+	 * Late initialization approach ..
 	 */
 	@Override
 	protected Connection getConnection() throws PIPException {
@@ -128,7 +127,7 @@ public class HyperCSVEngine extends JDBCEngine {
 		this.logger.info("Starting csv load from '" + this.source + "' in '" + this.target + "'");
 
 		StringBuilder createTable = new StringBuilder();
-		createTable.append("CREATE TEXT TABLE ")
+		createTable.append("CREATE TEXT TABLE IF NOT EXISTS ")
 							 .append(this.target)
 							 .append("(")
 							 .append(this.definition)

@@ -10,6 +10,8 @@
  */
 package com.att.research.xacmlatt.pdp.policy;
 
+import java.util.Properties;
+
 import com.att.research.xacml.api.Identifier;
 import com.att.research.xacml.util.FactoryException;
 import com.att.research.xacml.util.FactoryFinder;
@@ -27,7 +29,9 @@ public abstract class CombiningAlgorithmFactory {
 	private static final String DEFAULT_FACTORY_CLASSNAME	= "com.att.research.xacmlatt.pdp.std.StdCombiningAlgorithmFactory";
 	
 	protected CombiningAlgorithmFactory() {
-		
+	}
+	
+	protected CombiningAlgorithmFactory(Properties properties) {
 	}
 	
 	/**
@@ -53,6 +57,15 @@ public abstract class CombiningAlgorithmFactory {
 	 */
 	public static CombiningAlgorithmFactory newInstance() throws FactoryException {
 		return FactoryFinder.find(FACTORYID, DEFAULT_FACTORY_CLASSNAME, CombiningAlgorithmFactory.class);
+	}
+	
+	/**
+	 * Creates an instance of the <code>CombiningAlgorithmFactory</code> using default configuration information.
+	 * 
+	 * @return the default <code>CombiningAlgorithmFactory</code>
+	 */
+	public static CombiningAlgorithmFactory newInstance(Properties properties) throws FactoryException {
+		return FactoryFinder.find(FACTORYID, DEFAULT_FACTORY_CLASSNAME, CombiningAlgorithmFactory.class, properties);
 	}
 	
 	/**

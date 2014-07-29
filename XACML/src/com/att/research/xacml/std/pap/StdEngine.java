@@ -74,6 +74,17 @@ public class StdEngine extends StdPDPItemSetChangeNotifier implements PAPEngine 
 		this.intialize();
 	}
 	
+	public StdEngine(Properties properties) throws PAPException, IOException {
+		//
+		// Get the location in the file system of our repository
+		//
+		this.repository = Paths.get(properties.getProperty(PROP_PAP_REPO));
+		//
+		// Initialize
+		//
+		this.intialize();
+	}
+	
 	public StdEngine(Path repository) throws PAPException, IOException {
 		//
 		// Save our location

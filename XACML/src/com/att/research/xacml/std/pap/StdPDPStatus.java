@@ -41,18 +41,23 @@ public class StdPDPStatus implements Serializable, PDPStatus {
 	
 	public StdPDPStatus() {
 	}
-	
-	
-	
 
 	public void set(StdPDPStatus newStatus) {
 		this.status				=	newStatus.status;
-		this.loadErrors			=	newStatus.loadErrors;
-		this.loadWarnings		=	newStatus.loadWarnings;
-		this.loadedPolicies		=	newStatus.loadedPolicies;
-		this.failedPolicies		=	newStatus.failedPolicies;
-		this.loadedPIPConfigs	=	newStatus.loadedPIPConfigs;
-		this.failedPIPConfigs	=	newStatus.failedPIPConfigs;
+		this.loadErrors.clear();
+		this.loadErrors.addAll(newStatus.getLoadErrors());
+		this.loadWarnings.clear();
+		this.loadWarnings.addAll(newStatus.getLoadWarnings());
+		this.loadedPolicies.clear();
+		this.loadedPolicies.addAll(newStatus.getLoadedPolicies());
+		this.loadedRootPolicies.clear();
+		this.loadedRootPolicies.addAll(newStatus.getLoadedRootPolicies());
+		this.failedPolicies.clear();
+		this.failedPolicies.addAll(newStatus.getFailedPolicies());
+		this.loadedPIPConfigs.clear();
+		this.loadedPIPConfigs.addAll(newStatus.getLoadedPipConfigs());
+		this.failedPIPConfigs.clear();
+		this.failedPIPConfigs.addAll(newStatus.getFailedPipConfigs());
 	}
 	
 	
@@ -97,12 +102,8 @@ public class StdPDPStatus implements Serializable, PDPStatus {
 		return Collections.unmodifiableSet(this.loadedPolicies);
 	}
 	
-	public void setLoadedRootPolicies(Set<PDPPolicy> policies) {
-		this.loadedRootPolicies = policies;
-	}
-	
-	public void addAllLoadedRootPolicies(Set<PDPPolicy> policies) {
-		this.loadedRootPolicies.addAll(policies);
+	public void setLoadedPolicies(Set<PDPPolicy> policies) {
+		this.loadedPolicies = policies;
 	}
 	
 	public void addLoadedPolicy(PDPPolicy policy) {
@@ -114,14 +115,25 @@ public class StdPDPStatus implements Serializable, PDPStatus {
 		return Collections.unmodifiableSet(this.loadedRootPolicies);
 	}
 	
-	public void setLoadedPolicies(Set<PDPPolicy> policies) {
-		this.loadedPolicies = policies;
+	public void setLoadedRootPolicies(Set<PDPPolicy> policies) {
+		this.loadedRootPolicies = policies;
 	}
 	
-
+	public void addRootPolicy(PDPPolicy policy) {
+		this.loadedRootPolicies.add(policy);
+	}
+	
+	public void addAllLoadedRootPolicies(Set<PDPPolicy> policies) {
+		this.loadedRootPolicies.addAll(policies);
+	}
+	
 	@Override
 	public Set<PDPPolicy> getFailedPolicies() {
 		return Collections.unmodifiableSet(this.failedPolicies);
+	}
+	
+	public void	setFailedPolicies(Set<PDPPolicy> policies) {
+		this.failedPolicies = policies;
 	}
 	
 	public void addFailedPolicy(PDPPolicy policy) {
@@ -141,6 +153,10 @@ public class StdPDPStatus implements Serializable, PDPStatus {
 		return Collections.unmodifiableSet(this.loadedPIPConfigs);
 	}
 	
+	public void setLoadedPipConfigs(Set<PDPPIPConfig> configs) {
+		this.loadedPIPConfigs = configs;
+	}
+	
 	public void addLoadedPipConfig(PDPPIPConfig config) {
 		this.loadedPIPConfigs.add(config);
 	}
@@ -148,6 +164,10 @@ public class StdPDPStatus implements Serializable, PDPStatus {
 	@Override
 	public Set<PDPPIPConfig> getFailedPipConfigs() {
 		return Collections.unmodifiableSet(this.failedPIPConfigs);
+	}
+
+	public void setFailedPipConfigs(Set<PDPPIPConfig> configs) {
+		this.failedPIPConfigs = configs;
 	}
 	
 	public void addFailedPipConfig(PDPPIPConfig config) {
