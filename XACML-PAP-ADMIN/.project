@@ -5,6 +5,7 @@
 	<projects>
 		<project>XACML-REST</project>
 		<project>XACML</project>
+		<project>XACML-PDP</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
