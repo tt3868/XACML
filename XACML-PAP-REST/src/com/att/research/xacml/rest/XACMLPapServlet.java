@@ -1121,8 +1121,8 @@ public class XACMLPapServlet extends HttpServlet implements StdItemSetChangeList
 		
 		public Heartbeat(PAPEngine engine) {
 			this.papEngine = engine;
-			this.heartbeatInterval = Integer.parseInt(XACMLProperties.getProperty(XACMLRestProperties.PROP_PAP_HEARTBEAT_INTERVAL));
-			this.heartbeatTimeout = Integer.parseInt(XACMLProperties.getProperty(XACMLRestProperties.PROP_PAP_HEARTBEAT_TIMEOUT));
+			this.heartbeatInterval = Integer.parseInt(XACMLProperties.getProperty(XACMLRestProperties.PROP_PAP_HEARTBEAT_INTERVAL, "10000"));
+			this.heartbeatTimeout = Integer.parseInt(XACMLProperties.getProperty(XACMLRestProperties.PROP_PAP_HEARTBEAT_TIMEOUT, "10000"));
 		}
 
 		@Override
