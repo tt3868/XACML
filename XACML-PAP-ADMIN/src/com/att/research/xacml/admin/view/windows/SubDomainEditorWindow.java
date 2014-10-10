@@ -8,6 +8,8 @@ import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.Validator.InvalidValueException;
 import com.vaadin.data.validator.RegexpValidator;
+import com.vaadin.event.FieldEvents.TextChangeEvent;
+import com.vaadin.event.FieldEvents.TextChangeListener;
 import com.vaadin.event.ShortcutAction.KeyCode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -86,17 +88,18 @@ public class SubDomainEditorWindow extends Window {
 		// Respond to events
 		//
 		this.textFieldSubdomain.setImmediate(true);
-		this.textFieldSubdomain.addValueChangeListener(new ValueChangeListener() {
+		this.textFieldSubdomain.addTextChangeListener(new TextChangeListener() {
 			private static final long serialVersionUID = 1L;
 
 			@Override
-			public void valueChange(ValueChangeEvent event) {
-				if (self.textFieldSubdomain.getValue() != null && self.textFieldSubdomain.getValue().length() > 0) {
+			public void textChange(TextChangeEvent event) {
+				if (event.getText() != null && event.getText().length() > 0) {
 					self.buttonSave.setEnabled(true);
 				} else {
 					self.buttonSave.setEnabled(false);
 				}
-			}			
+			}
+			
 		});
 	}
 	
