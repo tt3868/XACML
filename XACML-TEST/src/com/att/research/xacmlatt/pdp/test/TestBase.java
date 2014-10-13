@@ -164,7 +164,8 @@ public class TestBase extends SimpleFileVisitor<Path> {
 	public static final String OPTION_TESTURL = "url";
 	public static final String OPTION_TESTOUTPUT = "output";
 	public static final String OPTION_LOOP = "loop";
-	
+	public static final String OPTION_TESTNUMBERS = "testNumbers";
+
 	public static final String DEFAULT_RESTURL = "https://localhost:8443/pdp/";
 	
 	public static Options options = new Options();
@@ -175,6 +176,7 @@ public class TestBase extends SimpleFileVisitor<Path> {
 		options.addOption(new Option(OPTION_TESTURL, true, "URL to the RESTful PDP. Default is " + DEFAULT_RESTURL));
 		options.addOption(new Option(OPTION_TESTOUTPUT, true, "Specify a different location for dumping responses."));
 		options.addOption(new Option(OPTION_LOOP, true, "Number of times to loop through the tests. Default is 1. A value of -1 runs indefinitely."));
+		options.addOption(new Option(OPTION_TESTNUMBERS, true, "Comma-separated list of numbers found in the names of the test files to be run.  Numbers must exactly match the file name, e.g. '02'.  Used to limit testing to specific set of tests."));
 	}
 	
 	protected String directory = null;
@@ -203,6 +205,8 @@ public class TestBase extends SimpleFileVisitor<Path> {
 	
 	private long	responseMatches = 0;
 	private long	responseNotMatches = 0;
+	
+	private String[]	testNumbersArray = null;
 	
 	protected final Pattern pattern = Pattern.compile("Request[.]\\d+[.](Permit|Deny|NA|Indeterminate|Generate|Unknown)\\.(json|xml)");
 	
@@ -267,6 +271,16 @@ public class TestBase extends SimpleFileVisitor<Path> {
 		}
 		if (cl.hasOption(OPTION_LOOP)) {
 			this.loop = Integer.parseInt(cl.getOptionValue(OPTION_LOOP));
+		}
+		if (cl.hasOption(OPTION_TESTNUMBERS)) {
+			String testNumberString = cl.getOptionValue(OPTION_TESTNUMBERS);
+			testNumbersArray = testNumberString.split(",");
+			//
+			// reset strings to include dots so they exactly match pattern in file name
+			//
+			for (int i = 0; i < testNumbersArray.length; i++) {
+				testNumbersArray[i] = "." + testNumbersArray[i] + ".";
+			}
 		}
 	}
 	
@@ -438,6 +452,25 @@ public class TestBase extends SimpleFileVisitor<Path> {
 		//
 		Matcher matcher = this.pattern.matcher(file.getFileName().toString());
 		if (matcher.matches()) {
+			//
+			// if user has limited which files to use, check that here
+			//
+			if (testNumbersArray != null) {
+				String fileNameString = file.getFileName().toString();
+				boolean found = false;
+				for (String numberString : testNumbersArray) {
+					if (fileNameString.contains(numberString)) {
+						found = true;
+						break;
+					}
+				}
+				if (found == false) {
+					//
+					// this test is not in the list to be run, so skip it
+					//
+					return super.visitFile(file, attrs);
+				}
+			}
 			try {
 				//
 				// Pull what this request is supposed to be
