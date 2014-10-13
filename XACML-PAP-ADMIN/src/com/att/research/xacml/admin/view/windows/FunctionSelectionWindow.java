@@ -60,6 +60,25 @@ public class FunctionSelectionWindow extends Window {
 	private String selectedFunction = null;
 	private boolean isSaved = false;
 	private static SQLContainer highOrderFunctions = ((XacmlAdminUI) UI.getCurrent()).getHigherOrderBagContainer();
+	/*
+	 * Seems that when this view is created it may or may not be upper case.
+	 */
+	private static String PROPERTY_SHORTNAME = "shortname";
+	private static String PROPERTY_XACMLID = "xacmlid";
+	
+	static {
+		for (Object prop : FunctionSelectionWindow.highOrderFunctions.getContainerPropertyIds()) {
+			logger.info("SQL Container Property Id: " + prop.toString());
+			if (prop.toString().equalsIgnoreCase(PROPERTY_SHORTNAME)) {
+				PROPERTY_SHORTNAME = prop.toString();
+			} else if (prop.toString().equalsIgnoreCase(PROPERTY_XACMLID)) {
+				PROPERTY_XACMLID = prop.toString();
+			}
+		}
+		
+	}
+	
+	
 	/**
 	 * The constructor should first build the main layout, set the
 	 * composition root and then do any custom initialization.
@@ -120,7 +139,7 @@ public class FunctionSelectionWindow extends Window {
 					//
 					// Add the new filter
 					//
-					this.currentFilter = new SimpleStringFilter("shortname", value, true, false);
+					this.currentFilter = new SimpleStringFilter(PROPERTY_SHORTNAME, value, true, false);
 					FunctionSelectionWindow.highOrderFunctions.addContainerFilter(this.currentFilter);
 				}
 			}
@@ -141,7 +160,7 @@ public class FunctionSelectionWindow extends Window {
 		this.tableFunctions.setRequiredError("Please select a function.");
 		this.tableFunctions.setSelectable(true);
 		this.tableFunctions.setPageLength(15);
-		this.tableFunctions.setVisibleColumns(new Object[] {"shortname", "xacmlid"});
+		this.tableFunctions.setVisibleColumns(new Object[] {PROPERTY_SHORTNAME, PROPERTY_XACMLID});
 		this.tableFunctions.setColumnHeaders(new String[] {"Short Function Name", "Xacml ID"});
 		//
 		// Respond to selection events
@@ -157,7 +176,7 @@ public class FunctionSelectionWindow extends Window {
 					if (item == null) {
 						return;
 					}
-					Property<?> property = item.getItemProperty("xacmlid");
+					Property<?> property = item.getItemProperty(PROPERTY_XACMLID);
 					if (property == null) {
 						return;
 					}
@@ -189,7 +208,7 @@ public class FunctionSelectionWindow extends Window {
 			for (Object id : FunctionSelectionWindow.highOrderFunctions.getItemIds()) {
 				Item item = FunctionSelectionWindow.highOrderFunctions.getItem(id);
 				if (item != null) {
-					Property<?> property = item.getItemProperty("xacmlid");
+					Property<?> property = item.getItemProperty(PROPERTY_XACMLID);
 					if (property != null) {
 						if (property.getValue().toString().equals(this.defaultFunctionID)) {
 							this.tableFunctions.select(id);

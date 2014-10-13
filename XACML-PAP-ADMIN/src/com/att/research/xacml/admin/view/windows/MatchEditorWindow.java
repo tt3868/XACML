@@ -61,6 +61,27 @@ public class MatchEditorWindow extends Window implements AttributeChangedEventLi
 	private boolean isSaved = false;
 	private static SQLContainer matchFunctions = ((XacmlAdminUI) UI.getCurrent()).getMatchFunctionContainer();
 		
+	private static String PROPERTY_SHORTNAME = "shortname";
+	private static String PROPERTY_XACMLID = "xacmlid";
+	private static String PROPERTY_ARG2_DATATYPE = "arg2_datatype";
+	
+	static {
+		//
+		// H2 seems to insist on capitalizing, even with the no uppercase switch.
+		//
+		for (Object prop : MatchEditorWindow.matchFunctions.getContainerPropertyIds()) {
+			logger.info("SQL Container Property Id: " + prop.toString());
+			if (prop.toString().equalsIgnoreCase(PROPERTY_SHORTNAME)) {
+				PROPERTY_SHORTNAME = prop.toString();
+			} else if (prop.toString().equalsIgnoreCase(PROPERTY_XACMLID)) {
+				PROPERTY_XACMLID = prop.toString();
+			} else if (prop.toString().equalsIgnoreCase(PROPERTY_ARG2_DATATYPE)) {
+				PROPERTY_ARG2_DATATYPE = prop.toString();
+			}
+		}
+		
+	}
+	
 	/**
 	 * The constructor should first build the main layout, set the
 	 * composition root and then do any custom initialization.
@@ -103,32 +124,14 @@ public class MatchEditorWindow extends Window implements AttributeChangedEventLi
 		this.tableFunctions.setRequiredError("Please select a function.");
 		this.tableFunctions.setSelectable(true);
 		this.tableFunctions.setPageLength(15);
-		for (String header : this.tableFunctions.getColumnHeaders()) {
-			if (logger.isDebugEnabled()) {
-				logger.debug("Header: " + header);
-			}
-			if (header.equals("shortname")) {
-				//
-				// Lower case table names
-				//
-				this.tableFunctions.setVisibleColumns(new Object[] {"shortname", "xacmlid"});
-				break;
-			}
-			if (header.equals("SHORTNAME")) {
-				//
-				// Upper case table names
-				//
-				this.tableFunctions.setVisibleColumns(new Object[] {"SHORTNAME", "XACMLID"});
-				break;
-			}
-		}
+		this.tableFunctions.setVisibleColumns(PROPERTY_SHORTNAME, PROPERTY_XACMLID);
 		this.tableFunctions.setColumnHeaders(new String[] {"Short Function Name", "Xacml ID"});
 		//
 		// Filter out functions where ARG2 is the given datatype. NOTE: The
 		// AttributeDesignator/AttributeSelector is the 2nd argument.
 		//
 		MatchEditorWindow.matchFunctions.removeAllContainerFilters();
-		MatchEditorWindow.matchFunctions.addContainerFilter(new Compare.Equal("arg2_datatype", this.datatype.getId()));
+		MatchEditorWindow.matchFunctions.addContainerFilter(new Compare.Equal(PROPERTY_ARG2_DATATYPE, this.datatype.getId()));
 		//
 		// Respond to selection events
 		//
@@ -143,7 +146,7 @@ public class MatchEditorWindow extends Window implements AttributeChangedEventLi
 					if (item == null) {
 						return;
 					}
-					Property<?> property = item.getItemProperty("xacmlid");
+					Property<?> property = item.getItemProperty(PROPERTY_XACMLID);
 					if (property == null) {
 						return;
 					}
@@ -175,7 +178,7 @@ public class MatchEditorWindow extends Window implements AttributeChangedEventLi
 			for (Object id : MatchEditorWindow.matchFunctions.getItemIds()) {
 				Item item = MatchEditorWindow.matchFunctions.getItem(id);
 				if (item != null) {
-					Property<?> property = item.getItemProperty("xacmlid");
+					Property<?> property = item.getItemProperty(PROPERTY_XACMLID);
 					if (property != null) {
 						if (property.getValue().toString().equals(this.match.getMatchId())) {
 							this.tableFunctions.select(id);
@@ -240,7 +243,7 @@ public class MatchEditorWindow extends Window implements AttributeChangedEventLi
 		// Filter out functions where ARG2 is the datatype. The
 		// AttributeDesignator/AttributeSelector is the 2nd arg.
 		//
-		MatchEditorWindow.matchFunctions.addContainerFilter(new Compare.Equal("ARG2_DATATYPE", datatype.getId()));
+		MatchEditorWindow.matchFunctions.addContainerFilter(new Compare.Equal(PROPERTY_ARG2_DATATYPE, datatype.getId()));
 	}
 	
 	public boolean isSaved() {
