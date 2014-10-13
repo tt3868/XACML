@@ -345,6 +345,10 @@ public class PolicyEditor extends CustomComponent {
 						self.editVariable((VariableDefinitionType) target, (PolicyType) self.policyContainer.getParent(target));
 					} else if (target instanceof MatchType) {
 						self.editMatch((MatchType) target, (AllOfType) self.policyContainer.getParent(target), null, null, "Edit Match");
+					} else if (target instanceof ObligationExpressionType) {
+						self.editObAdvice(true, self.policyContainer.getParent(target));
+					} else if (target instanceof AdviceExpressionType) {
+						self.editObAdvice(false, self.policyContainer.getParent(target));
 					}
 				}
 			}
