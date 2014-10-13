@@ -24,6 +24,8 @@ import com.att.research.xacml.api.pip.PIPException;
 import com.att.research.xacml.api.pip.PIPFinder;
 import com.att.research.xacml.api.pip.PIPRequest;
 import com.att.research.xacml.api.pip.PIPResponse;
+import com.att.research.xacml.std.StdStatus;
+import com.att.research.xacml.std.StdStatusCode;
 import com.att.research.xacml.std.pip.StdMutablePIPResponse;
 import com.att.research.xacml.std.pip.StdPIPResponse;
 
@@ -72,12 +74,14 @@ public class EngineFinder implements PIPFinder {
 					try {
 						pipResponseEngine = pipEngine.getAttributes(pipRequest, pipFinderParent);
 					} catch (Exception e) {
+						pipResponseEngine = new StdPIPResponse(new
+								StdStatus(StdStatusCode.STATUS_CODE_PROCESSING_ERROR));
 					}
 					if (pipResponseEngine != null) {
 						if (pipResponseEngine.getStatus() == null || pipResponseEngine.getStatus().isOk()) {
 							pipResponse.addAttributes(pipResponseEngine.getAttributes());
 						} else if (firstErrorStatus == null) {
-							firstErrorStatus	= pipResponse.getStatus();
+							firstErrorStatus = pipResponseEngine.getStatus();
 						}
 					}
 				}
