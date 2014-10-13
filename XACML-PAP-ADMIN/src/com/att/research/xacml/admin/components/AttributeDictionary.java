@@ -221,6 +221,12 @@ public class AttributeDictionary extends CustomComponent {
 				// Remove the attribute
 				//
 				self.attributes.removeItem(id);
+				//
+				// Unfortunately, removing the item does NOT result
+				// in a ValueChange event being generated. So we must
+				// trigger it ourselves.
+				//
+				self.table.select(self.table.getNullSelectionItemId());
 			}	
 		});
 		
