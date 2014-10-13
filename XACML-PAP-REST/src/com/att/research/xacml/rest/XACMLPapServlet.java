@@ -144,8 +144,21 @@ public class XACMLPapServlet extends HttpServlet implements StdItemSetChangeList
 			//
 			XACMLPapServlet.papURL = XACMLProperties.getProperty(XACMLRestProperties.PROP_PAP_URL);
 			//
+			// Sanity check that a URL was defined somewhere, its essential.
+			//
+			// How to check that its valid? We can validate the form, but since we are in the init() method we
+			// are not fully loaded yet so we really couldn't ping ourself to see if the URL will work. One
+			// will have to look for errors in the PDP logs to determine if they are failing to initiate a
+			// request to this servlet.
+			//
+			if (XACMLPapServlet.papURL == null) {
+				throw new PAPException("The property " + XACMLRestProperties.PROP_PAP_URL + " is not valid: " + XACMLPapServlet.papURL);
+			}
+			//
 			// Configurable - have the PAP servlet initiate sending the latest PDP policy/pip configuration
 			// to all its known PDP nodes.
+			//
+			// Note: parseBoolean will return false if there is no property defined. This is fine for a default.
 			//
 			if (Boolean.parseBoolean(XACMLProperties.getProperty(XACMLRestProperties.PROP_PAP_INITIATE_PDP_CONFIG))) {
 				this.initiateThread = new Thread(this);
