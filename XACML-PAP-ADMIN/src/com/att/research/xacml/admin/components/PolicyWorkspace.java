@@ -57,6 +57,7 @@ import com.att.research.xacml.admin.view.windows.GitPushWindow;
 import com.att.research.xacml.admin.view.windows.GitSynchronizeWindow;
 import com.att.research.xacml.admin.view.windows.PolicyNameEditorWindow;
 import com.att.research.xacml.admin.view.windows.PolicyUploadWindow;
+import com.att.research.xacml.admin.view.windows.RenamePolicyFileWindow;
 import com.att.research.xacml.admin.view.windows.SubDomainEditorWindow;
 import com.att.research.xacml.std.pap.StdPDPPolicy;
 import com.att.research.xacml.util.XACMLPolicyScanner;
@@ -83,6 +84,7 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.HorizontalSplitPanel;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.TabSheet.CloseHandler;
 import com.vaadin.ui.TabSheet.Tab;
@@ -381,6 +383,7 @@ public class PolicyWorkspace extends CustomComponent implements DropHandler, OnD
 					return;
 				}
 				if (action == RENAME_POLICY) {
+					self.renamePolicy((File) target);
 					return;
 					
 				}
@@ -639,6 +642,44 @@ public class PolicyWorkspace extends CustomComponent implements DropHandler, OnD
 		// Run the window
 		//
 		this.runPolicyWindow("Create New Policy", parent, newFile, null, null);
+	}
+	
+	protected void	renamePolicy(final File policy) {
+		//
+		// Run the rename window
+		//
+		final RenamePolicyFileWindow window = new RenamePolicyFileWindow(policy.getName());
+		window.setCaption("Rename Policy");
+		window.setModal(true);
+		window.addCloseListener(new CloseListener() {
+			private static final long serialVersionUID = 1L;
+			
+			@Override
+			public void windowClose(CloseEvent event) {
+				String newFilename = window.getNewFilename();
+				if (newFilename == null) {
+					//
+					// User cancelled
+					//
+					return;
+				}
+				Path newPolicy = Paths.get(policy.getParent(), newFilename);
+				if (Files.exists(newPolicy)) {
+					Notification.show("Cannot rename to an existing file", Notification.Type.ERROR_MESSAGE);
+					return;
+				}
+				try {
+					if (policy.renameTo(newPolicy.toFile()) == false) {
+						throw new Exception("No known error, rename failed");
+					}
+					self.treeContainer.updateItem(newPolicy.getParent().toFile());
+				} catch (Exception e) {
+					Notification.show("Failed to rename file: " + e.getLocalizedMessage());
+				}
+			}
+		});
+		window.center();
+		UI.getCurrent().addWindow(window);
 	}
 	
 	protected void	clonePolicy(final File policy) {
@@ -1396,6 +1437,7 @@ public class PolicyWorkspace extends CustomComponent implements DropHandler, OnD
 				//
 				// Prompt the user
 				//
+				Notification.show("A policy file with that name already exists in that directory.", Notification.Type.ERROR_MESSAGE);
 			} else {
 				//
 				// Go ahead and rename it
