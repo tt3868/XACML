@@ -541,7 +541,8 @@ public class PolicyContainer extends ItemSetChangeNotifier implements Container.
 					itemId instanceof ObligationExpressionsType) {
 			if ((parent instanceof PolicyType || 
 				parent instanceof PolicySetType || 
-				parent instanceof RuleType)) {
+				parent instanceof RuleType ||
+				parent instanceof ObligationExpressionsType)) {
 				if (itemId instanceof ObligationExpressionType) {
 					this.addObligation(parent, (ObligationExpressionType) itemId, true);
 				} else {
@@ -552,7 +553,8 @@ public class PolicyContainer extends ItemSetChangeNotifier implements Container.
 					itemId instanceof AdviceExpressionsType) {
 			if ((parent instanceof PolicyType || 
 				parent instanceof PolicySetType || 
-				parent instanceof RuleType)) {
+				parent instanceof RuleType ||
+				parent instanceof AdviceExpressionsType)) {
 				if (itemId instanceof AdviceExpressionType) {
 					this.addAdvice(parent, (AdviceExpressionType) itemId, true);
 				} else {
@@ -774,6 +776,14 @@ public class PolicyContainer extends ItemSetChangeNotifier implements Container.
 				expressions = new ObligationExpressionsType();
 				((RuleType) parent).setObligationExpressions(expressions);
 			}
+		} else if (parent instanceof ObligationExpressionsType) {
+			expressions = (ObligationExpressionsType) parent;
+			if (bAdd) {
+				expressions.getObligationExpression().add(expression);
+			}
+			parent = this.getParent(expressions);
+			this.obligations.put(expression, parent);
+			return;
 		}
 		if (bAdd) {
 			expressions.getObligationExpression().add(expression);
@@ -819,6 +829,14 @@ public class PolicyContainer extends ItemSetChangeNotifier implements Container.
 				expressions = new AdviceExpressionsType();
 				((RuleType) parent).setAdviceExpressions(expressions);
 			}
+		} else if (parent instanceof AdviceExpressionsType) {
+			expressions = (AdviceExpressionsType) parent;
+			if (bAdd) {
+				expressions.getAdviceExpression().add(expression);
+			}
+			parent = this.getParent(expressions);
+			this.advice.put(expression, parent);
+			return;
 		}
 		if (bAdd) {
 			expressions.getAdviceExpression().add(expression);
@@ -927,6 +945,11 @@ public class PolicyContainer extends ItemSetChangeNotifier implements Container.
 	public Object getParent(Object itemId) {
 		if (logger.isTraceEnabled()) {
 			logger.trace("getParent: " + itemId);
+		}
+		assert(itemId != null);
+		if (itemId == null) {
+			logger.fatal("getParent called with NULL object");
+			return null;
 		}
 		if (itemId.equals(this.root)) {
 			if (logger.isTraceEnabled()) {
