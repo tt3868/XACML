@@ -1007,38 +1007,60 @@ public class ObligationAdviceContainer extends ItemSetChangeNotifier implements 
 			if (itemId instanceof ObligationExpressionType) {
 				if (((ObligationExpressionsType) this.root).getObligationExpression().remove(itemId)) {
 					//
+					// Remove this
+					//
+					if (this.rootObligations.remove(itemId) == false) {
+						//
+						//
+						//
+						assert(false);
+						logger.error("Removing item " + itemId + " failed to remove it from root obligation list");
+					}
+					//
 					// Notify
 					//
 					this.fireItemSetChange();
-					return this.rootObligations.remove(itemId);
+					return true ;
 				}
 			} else if (itemId instanceof AttributeAssignmentExpressionType) {
 				ObligationExpressionType parent = this.obligationExpressions.get(itemId);
 				if (parent != null && parent.getAttributeAssignmentExpression().remove(itemId)) {
+					if (this.obligationExpressions.remove(itemId) == null) {
+						assert(false);
+						logger.error("Removing item " + itemId + " failed to remove it from obligation expressions map");
+					}
 					//
 					// Notify
 					//
 					this.fireItemSetChange();
-					return (this.obligationExpressions.remove(itemId) != null);
+					return true;
 				}
 			}
 		} else if (this.root instanceof AdviceExpressionsType) {
 			if (itemId instanceof AdviceExpressionType) {
 				if (((AdviceExpressionsType) this.root).getAdviceExpression().remove(itemId)) {
+					if (this.rootAdvice.remove(itemId) == false) {
+						assert(false);
+						logger.error("Removing item " + itemId + " failed to remove it from root advice list");
+					}
 					//
 					// Notify
 					//
 					this.fireItemSetChange();
-					return this.rootAdvice.remove(itemId);
+					return true;
 				}
 			} else if (itemId instanceof AttributeAssignmentExpressionType) {
 				AdviceExpressionType parent = this.adviceExpressions.get(itemId);
 				if (parent != null && parent.getAttributeAssignmentExpression().remove(itemId)) {
+					if (this.adviceExpressions.remove(itemId) == null) {
+						assert(false);
+						logger.error("Removing item " + itemId + " failed to remove it from advice expressions map");
+					}
 					//
 					// Notify
 					//
 					this.fireItemSetChange();
-					return (this.adviceExpressions.remove(itemId) != null);
+					return true;
 				}
 			}
 		}
