@@ -14,6 +14,7 @@ import java.util.Map;
 
 import oasis.names.tc.xacml._3_0.core.schema.wd_17.AdviceExpressionType;
 import oasis.names.tc.xacml._3_0.core.schema.wd_17.AdviceExpressionsType;
+import oasis.names.tc.xacml._3_0.core.schema.wd_17.ApplyType;
 import oasis.names.tc.xacml._3_0.core.schema.wd_17.AttributeAssignmentExpressionType;
 import oasis.names.tc.xacml._3_0.core.schema.wd_17.AttributeDesignatorType;
 import oasis.names.tc.xacml._3_0.core.schema.wd_17.AttributeSelectorType;
@@ -183,7 +184,8 @@ public class ObligationAdviceEditorWindow extends Window {
 				}
 				if (target instanceof AttributeValueType ||
 					target instanceof AttributeDesignatorType ||
-					target instanceof AttributeSelectorType) {
+					target instanceof AttributeSelectorType ||
+					target instanceof ApplyType) {
 					return new Action[] {EDIT_ATTRIBUTE, REMOVE_ATTRIBUTE};
 				}
 				return null;
@@ -251,14 +253,16 @@ public class ObligationAdviceEditorWindow extends Window {
 				if (action == EDIT_ATTRIBUTE) {
 					assert(target instanceof AttributeValueType ||
 							target instanceof AttributeDesignatorType ||
-							target instanceof AttributeSelectorType);
+							target instanceof AttributeSelectorType ||
+							target instanceof ApplyType);
 					self.editAttribute(target, (AttributeAssignmentExpressionType) self.container.getParent(target));
 					return;
 				}
 				if (action == REMOVE_ATTRIBUTE) {
 					assert(target instanceof AttributeValueType ||
 							target instanceof AttributeDesignatorType ||
-							target instanceof AttributeSelectorType);
+							target instanceof AttributeSelectorType ||
+							target instanceof ApplyType);
 					if (self.container.removeItem(target) == false) {
 						logger.error("Failed to remove attribute");
 						assert(false);
@@ -320,6 +324,9 @@ public class ObligationAdviceEditorWindow extends Window {
 					if (itemId instanceof AttributeSelectorType) {
 						return ((AttributeSelectorType) itemId).getContextSelectorId();
 					}
+					if (itemId instanceof ApplyType) {
+						return ((ApplyType) itemId).getDescription();
+					}
 				}
 				if (propertyId == ObligationAdviceContainer.PROPERTY_CATEGORY_SHORT) {
 					if (itemId instanceof AttributeAssignmentExpressionType) {
@@ -331,6 +338,9 @@ public class ObligationAdviceEditorWindow extends Window {
 					if (itemId instanceof AttributeSelectorType) {
 						return ((AttributeSelectorType) itemId).getCategory();
 					}
+					if (itemId instanceof ApplyType) {
+						return null;
+					}
 				}
 				if (propertyId == ObligationAdviceContainer.PROPERTY_DATATYPE_SHORT) {
 					if (itemId instanceof AttributeValueType) {
@@ -341,6 +351,11 @@ public class ObligationAdviceEditorWindow extends Window {
 					}
 					if (itemId instanceof AttributeSelectorType) {
 						return ((AttributeSelectorType) itemId).getDataType();
+					}
+					if (itemId instanceof ApplyType) {
+						//
+						// TODO - get the datatype for the function
+						//
 					}
 				}
 				return null;
@@ -381,9 +396,10 @@ public class ObligationAdviceEditorWindow extends Window {
 				if (object != null) {
 					if (object instanceof AttributeValueType ||
 						object instanceof AttributeDesignatorType ||
-						object instanceof AttributeSelectorType) {
+						object instanceof AttributeSelectorType ||
+						object instanceof ApplyType) {
 						if (self.container.removeItem(self.container.getParent(object)) == false) {
-							logger.error("Failed to remove attribute value/des/sel");
+							logger.error("Failed to remove attribute value/des/sel/apply");
 							assert(false);
 						}
 					} else {
@@ -478,9 +494,44 @@ public class ObligationAdviceEditorWindow extends Window {
 		}
 	}
 	
-	protected void editAttribute(Object target, AttributeAssignmentExpressionType parent) {
-		// TODO Auto-generated method stub
-		
+	protected void editAttribute(Object target, final AttributeAssignmentExpressionType parent) {
+		//
+		// Make a copy
+		//
+		final AttributeAssignmentExpressionType copyAssignment = (parent == null ? new AttributeAssignmentExpressionType() : XACMLObjectCopy.copy(parent));
+		//
+		// Prompt user for attribute right away
+		//
+		final ExpressionBuilderComponent builder = new ExpressionBuilderComponent(copyAssignment, copyAssignment.getExpression() != null ? copyAssignment.getExpression().getValue() : null, null, self.variables);
+		builder.setCaption("Define Assignment Attribute");
+		builder.setModal(true);
+		builder.addCloseListener(new CloseListener() {
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void windowClose(CloseEvent e) {
+				//
+				// Did the user save?
+				//
+				if (builder.isSaved() == false) {
+					return;
+				}
+				//
+				// Yes - update it
+				//
+				parent.setExpression(copyAssignment.getExpression());
+				if (parent.getExpression() != null) {
+					self.container.removeItem(parent.getExpression().getValue());
+				}
+				self.container.addItem(copyAssignment.getExpression().getValue(), parent);
+				//
+				// Set the table size
+				//
+				self.tableExpressions.setPageLength(self.container.size() + 1);
+			}
+		});
+		builder.center();
+		UI.getCurrent().addWindow(builder);
 	}
 
 	protected void editExpression(final AttributeAssignmentExpressionType assignment, final Object parent) {
