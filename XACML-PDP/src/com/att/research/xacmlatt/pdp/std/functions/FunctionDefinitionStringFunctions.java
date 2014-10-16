@@ -81,14 +81,16 @@ public class FunctionDefinitionStringFunctions<O, I> extends FunctionDefinitionB
 	}
 
 
+	@SuppressWarnings("incomplete-switch")
 	@Override
 	public ExpressionResult evaluate(EvaluationContext evaluationContext, List<FunctionArgument> arguments) {
 
 		if (arguments == null || 
-				(operation != OPERATION.SUBSTRING && arguments.size() != 2) ||
-				(operation == OPERATION.SUBSTRING && arguments.size() != 3)) {
+				(operation == OPERATION.CONCATENATE && arguments.size() < 2) ||
+				(operation == OPERATION.SUBSTRING && arguments.size() != 3) ||
+				(operation != OPERATION.SUBSTRING && operation != OPERATION.CONCATENATE && arguments.size() != 2) ) {
 			return ExpressionResult.newError(new StdStatus(StdStatusCode.STATUS_CODE_PROCESSING_ERROR, this.getShortFunctionId() + " Expected " +
-				((operation == OPERATION.SUBSTRING) ? 3 : 2) + " arguments, got " + 
+				((operation == OPERATION.SUBSTRING) ? 3 : (operation == OPERATION.CONCATENATE ? "2 or more " : 2)) + " arguments, got " + 
 					((arguments == null) ? "null" : arguments.size()) ));
 		}
 		
@@ -102,8 +104,32 @@ public class FunctionDefinitionStringFunctions<O, I> extends FunctionDefinitionB
 		Integer secondArgumentAsInteger = null;
 		Integer thirdArgumentAsInteger = null;
 		
-		// most of the functions take 2  args, but SUBSTRING takes 3
-		if (operation == OPERATION.SUBSTRING) {
+		// most of the functions take 2  args, but SUBSTRING takes 3 AND concatenate takes 2 or more
+		if (operation == OPERATION.CONCATENATE) {
+			StringBuilder builder = new StringBuilder();
+			for (int i = 0; i < arguments.size(); i++) {
+				FunctionArgument functionArgument = arguments.get(i);
+				ConvertedArgument<I> convertedArgument = new ConvertedArgument<I>(functionArgument, this.getDataTypeArgs(), false);
+				if ( ! convertedArgument.isOk()) {
+					return ExpressionResult.newError(getFunctionStatus(convertedArgument.getStatus()));
+				}
+				try {
+					String argumentAsString = this.getDataTypeArgs().toStringValue( convertedArgument.getValue());
+					builder.append(argumentAsString);
+				} catch (DataTypeException e) {
+					String message = e.getMessage();
+					if (e.getCause() != null) {
+						message = e.getCause().getMessage();
+					}
+					return ExpressionResult.newError(new StdStatus(StdStatusCode.STATUS_CODE_PROCESSING_ERROR, this.getShortFunctionId() + " " + message ));
+				}
+			}
+			AttributeValue<String> stringResult =  new StdAttributeValue<String>(XACML.ID_DATATYPE_STRING, 
+					builder.toString() );
+			expressionResult = ExpressionResult.newSingle(stringResult);
+			return expressionResult;
+			
+		} else if (operation == OPERATION.SUBSTRING) {
 			// first arg is of generic type
 			FunctionArgument functionArgument = arguments.get(0);
 			ConvertedArgument<I> convertedArgument0 = new ConvertedArgument<I>(functionArgument, this.getDataTypeArgs(), false);
@@ -183,12 +209,6 @@ public class FunctionDefinitionStringFunctions<O, I> extends FunctionDefinitionB
 		// arguments are ready - do the operation
 		
 		switch (operation) {
-		case CONCATENATE:
-			AttributeValue<String> stringResult =  new StdAttributeValue<String>(XACML.ID_DATATYPE_STRING, 
-					(firstArgumentAsString + secondArgumentAsString) );
-			expressionResult = ExpressionResult.newSingle(stringResult);
-			break;
-			
 		case STARTS_WITH:
 			if (secondArgumentAsString.startsWith(firstArgumentAsString)) {
 				return ER_TRUE;
@@ -219,7 +239,7 @@ public class FunctionDefinitionStringFunctions<O, I> extends FunctionDefinitionB
 			} else {
 				substring = firstArgumentAsString.substring(secondArgumentAsInteger, thirdArgumentAsInteger);
 			}
-			stringResult =  new StdAttributeValue<String>(XACML.ID_DATATYPE_STRING, substring);
+			AttributeValue<String> stringResult =  new StdAttributeValue<String>(XACML.ID_DATATYPE_STRING, substring);
 			expressionResult = ExpressionResult.newSingle(stringResult);
 			break;
 		}
