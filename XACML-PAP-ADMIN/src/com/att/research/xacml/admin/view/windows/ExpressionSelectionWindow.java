@@ -69,9 +69,9 @@ public class ExpressionSelectionWindow extends Window {
 	}
 	
 	private void initializeOption(ApplyType parentApply, boolean isAttributeAssignment, boolean mustBeBag, boolean mustBeValue) {
-		if (!isAttributeAssignment) {
+//		if (!isAttributeAssignment) {
 			this.optionGroupExpression.addItem(OPTION_APPLY);
-		}
+//		}
 		if (!mustBeBag || mustBeValue) {
 			this.optionGroupExpression.addItem(OPTION_VALUE);
 		}
