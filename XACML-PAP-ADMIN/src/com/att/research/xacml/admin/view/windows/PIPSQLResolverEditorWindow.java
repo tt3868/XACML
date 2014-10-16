@@ -1167,7 +1167,7 @@ public class PIPSQLResolverEditorWindow extends CustomComponent implements FormC
 		
 		// tableRequiredAttributes
 		tableRequiredAttributes = new Table();
-		tableRequiredAttributes.setCaption("Required Attributes");
+		tableRequiredAttributes.setCaption("Attributes Returned");
 		tableRequiredAttributes.setImmediate(false);
 		tableRequiredAttributes.setWidth("-1px");
 		tableRequiredAttributes.setHeight("-1px");
@@ -1175,7 +1175,7 @@ public class PIPSQLResolverEditorWindow extends CustomComponent implements FormC
 		
 		// tableAttributes
 		tableAttributes = new Table();
-		tableAttributes.setCaption("Attributes Provided");
+		tableAttributes.setCaption("Parameters - Attributes Needed (i.e. ?)");
 		tableAttributes.setImmediate(false);
 		tableAttributes.setWidth("-1px");
 		tableAttributes.setHeight("-1px");
