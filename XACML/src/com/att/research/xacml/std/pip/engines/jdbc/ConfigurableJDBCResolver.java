@@ -376,23 +376,44 @@ public class ConfigurableJDBCResolver implements JDBCResolver {
 				this.logger.warn("Unknown data type " + pipRequestAttribute.getDataTypeId().stringValue());
 				return null;
 			}
+			/*
+			 * Try to find the column index
+			 */
+			
+			int columnIndex = -1;
+			
+			try {
+				columnIndex = resultSet.findColumn(fieldName);
+			} catch (Exception e) {
+				/*
+				 * The field name could be an integer, let's try that
+				 */
+				try {
+					columnIndex = Integer.parseInt(fieldName);
+				} catch (Exception e1) {
+					logger.error("Failed to find column with label " + fieldName);
+				}
+			}
+			if (this.logger.isDebugEnabled()) {
+				this.logger.debug("Column " + fieldName + " maps to column index " + columnIndex);
+			}
 			
 			/*
 			 * Catch special cases for database types
 			 */
 			if (identifierDataType.equals(XACML3.ID_DATATYPE_BOOLEAN)) {
-				attributeValue	= dataType.createAttributeValue(resultSet.getBoolean(fieldName));
+				attributeValue	= dataType.createAttributeValue(resultSet.getBoolean(columnIndex));
 			} else if (identifierDataType.equals(XACML3.ID_DATATYPE_DATE) || identifierDataType.equals(XACML3.ID_DATATYPE_DATETIME)) {
-				attributeValue	= dataType.createAttributeValue(resultSet.getDate(fieldName));
+				attributeValue	= dataType.createAttributeValue(resultSet.getDate(columnIndex));
 			} else if (identifierDataType.equals(XACML3.ID_DATATYPE_DOUBLE)) {
-				attributeValue	= dataType.createAttributeValue(resultSet.getDouble(fieldName));
+				attributeValue	= dataType.createAttributeValue(resultSet.getDouble(columnIndex));
 			} else if (identifierDataType.equals(XACML3.ID_DATATYPE_INTEGER)) {
-				attributeValue	= dataType.createAttributeValue(resultSet.getInt(fieldName));
+				attributeValue	= dataType.createAttributeValue(resultSet.getInt(columnIndex));
 			} else {
 				/*
 				 * Default to convert the string value from the database to the requested data type
 				 */
-				String stringValue	= resultSet.getString(fieldName);
+				String stringValue	= resultSet.getString(columnIndex);
 				if (stringValue != null) {
 					attributeValue	= dataType.createAttributeValue(stringValue);
 				}
