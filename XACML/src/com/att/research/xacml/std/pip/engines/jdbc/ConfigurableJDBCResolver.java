@@ -321,11 +321,11 @@ public class ConfigurableJDBCResolver implements JDBCResolver {
 							Identifier identifierAttributeValueDataType	= attributeValue.getDataTypeId();
 							try {
 								if (identifierAttributeValueDataType.equals(XACML3.ID_DATATYPE_INTEGER)) {
-									preparedStatement.setInt(i, DataTypes.DT_INTEGER.convert(attributeValue.getValue()).intValue());
+									preparedStatement.setInt(i+1, DataTypes.DT_INTEGER.convert(attributeValue.getValue()).intValue());
 								} else if (identifierAttributeValueDataType.equals(XACML3.ID_DATATYPE_DOUBLE)) {
-									preparedStatement.setDouble(i, DataTypes.DT_DOUBLE.convert(attributeValue.getValue()));
+									preparedStatement.setDouble(i+1, DataTypes.DT_DOUBLE.convert(attributeValue.getValue()));
 								} else if (identifierAttributeValueDataType.equals(XACML3.ID_DATATYPE_BOOLEAN)) {
-									preparedStatement.setBoolean(i, DataTypes.DT_BOOLEAN.convert(attributeValue.getValue()));
+									preparedStatement.setBoolean(i+1, DataTypes.DT_BOOLEAN.convert(attributeValue.getValue()));
 								} else if (identifierAttributeValueDataType.equals(XACML3.ID_DATATYPE_DATETIME)) {
 									ISO8601DateTime iso8601DateTime	= DataTypes.DT_DATETIME.convert(attributeValue.getValue());
 									java.sql.Date sqlDate			= new java.sql.Date(iso8601DateTime.getCalendar().getTimeInMillis());
